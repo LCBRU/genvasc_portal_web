@@ -1,0 +1,38 @@
+{% extends "_base.html" %}
+{% import "_formHelpers.html" as formhelper %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1>Submissions for Reimbursement</h1>
+</div>
+
+
+<table class="table table-striped table-hover">
+	<caption>Details of reimbursements submitted to the CRN for participants recruited in the given period.</caption>
+	<thead>
+		<tr>
+			<th>Year</th>
+			<th>Quarter</th>
+			<th>Participants</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for s in submissions.items %}
+			<tr>
+				<td>{{ s.invoice_year }}</td>
+				<td>{{ s.invoice_quarter }}</td>
+				<td>{{ s.participants }}</td>
+				<td>
+					<a href="{{ url_for('submissions_participants', invoice_year=s.invoice_year, invoice_quarter=s.invoice_quarter) }}">Details</a>
+					<a href="{{ url_for('submissions_csv', invoice_year=s.invoice_year, invoice_quarter=s.invoice_quarter) }}">CSV</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{{ formhelper.render_pagination(submissions, 'submissions_index') }}
+
+{% endblock %}

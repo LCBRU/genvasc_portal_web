@@ -1,0 +1,121 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>{{ practice_registration.practice.name }} submission for {{ invoice_year }} {{ invoice_quarter }}</title>
+
+  <style>
+  	@page {
+  		size: A4 landscape;
+
+	    @bottom-right {
+	        content: "Page " counter(page)
+	                 " of " counter(pages);
+	        font-size: 10px;
+	    }                 
+
+	    @bottom-left {
+	        content: "Downloaded: {{ now | datetime_format }}";
+	        font-size: 10px;
+	    }
+  	}
+
+  	body {
+  		font-family: Arial, Helvetica, sans-serif;
+  	}
+
+  	h1, h2 {
+  		margin: 0;
+  		text-align: center;
+  	}
+
+  	h1 {
+  		font-style: italic;
+  	}
+
+  	h2 {
+  		color: #777;
+  	}
+
+  	table {
+  		margin: 20px auto;
+  	}
+
+  	table td, table th {
+  		padding: 5px 10px;
+  	}
+
+  	table.recruits {
+  		border: 1px solid #000;
+		border-collapse:collapse;
+  	}
+
+  	table.recruits td, table.recruits th {
+  		border: 1px solid #000;
+  	}
+
+  	table.recruits thead {
+  		background-color: #CCC;
+  	}
+
+  	table.totals td:nth-child(1) {
+  		font-weight: bold;
+	}
+
+  	table.totals td:nth-child(2) {
+  		text-align: right;
+	}
+
+  </style>
+</head>
+
+<body>
+
+	<h1>{{ practice_registration.practice.name }}</h1>
+	<h2>GENVASC Reimbursement Report for {{ invoice_quarter }} {{ invoice_year }}</h2>
+
+	<table class="totals">
+		<tr>
+			<td>Patients Recruited</td>
+			<td>{{ totals.count }}</td>
+		</tr>
+		<tr>
+			<td>Excluded</td>
+			<td>{{ totals.excluded }}</td>
+		</tr>
+		<tr>
+			<td>Submitted for Reimbursement</td>
+			<td>{{ totals.submitted }}</td>
+		</tr>
+		<tr>
+			<td>Reimbursement Value</td>
+			<td>{{ totals.value | currency }}</td>
+		</tr>
+	</table>
+
+	<table class="recruits">
+		<thead>
+			<tr>
+				<th>Start Date</th>
+				<th>Recruitement Status</th>
+				<th>Name</th>
+				<th>Study ID</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for p in participants %}
+				<tr>
+					<td>{{ p.recruit.date_recruited | date_format }}</td>
+					<td>{{ p.status }}</td>
+					<td>{{ p.full_name }}</td>
+					<td>{{ p.study_id }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+
+</body>
+</html>

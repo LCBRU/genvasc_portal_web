@@ -1,0 +1,34 @@
+{% extends "practices/_practice_base.html" %}
+{% set tab = "reimbursements" %}
+{% import "_formHelpers.html" as formhelper %}
+
+{% block practice_content %}
+
+<table class="table table-striped table-hover">
+	<caption>Details of reimbursements submitted to the CRN for participants recruited in the given period.</caption>
+	<thead>
+		<tr>
+			<th>Year</th>
+			<th>Quarter</th>
+			<th>Participants</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for r in reimbursements.items %}
+			<tr>
+				<td>{{ r.invoice_year }}</td>
+				<td>{{ r.invoice_quarter }}</td>
+				<td>{{ r.participants }}</td>
+				<td>
+					<a href="{{ url_for('reimbursements_participants', code=practice_registration.code, invoice_year=r.invoice_year, invoice_quarter=r.invoice_quarter) }}">Details</a>
+					<a href="{{ url_for('reimbursements_pdf', code=practice_registration.code, invoice_year=r.invoice_year, invoice_quarter=r.invoice_quarter) }}" target="_blank">PDF</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{{ formhelper.render_pagination(reimbursements, 'reimbursements_index', code=practice_registration.code) }}
+
+{% endblock %}

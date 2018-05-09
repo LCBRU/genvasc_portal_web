@@ -1,0 +1,38 @@
+---
+email: "lcbruit@uhl-tr.nhs.uk"
+first_name: "System"
+last_name: "User"
+inactive: True
+---
+email: "user@practice.nhs.uk"
+first_name: "Practice"
+last_name: "user"
+practices:
+  - "K83032"
+  - "C82062"
+---
+email: "admin@lcbru.nhs.uk"
+first_name: "Admin"
+last_name: "User"
+is_admin: True
+---
+email: "christopher.greengrass@uhl-tr.nhs.uk"
+first_name: "Chris"
+last_name: "Greengrass"
+practices:
+  - K83610
+---
+email: "richard.a.bramley@uhl-tr.nhs.uk"
+first_name: "Richard"
+last_name: "Bramley"
+is_admin: True
+---
+email: "daniel.brewer@uhl-tr.nhs.uk"
+first_name: "Daniel"
+last_name: "Brewer"
+is_admin: True
+---
+email: "Dawn.Woods@uhl-tr.nhs.uk"
+first_name: "Dawn"
+last_name: "Woods"
+is_admin: True

@@ -1,0 +1,139 @@
+{% macro render_field(field) %}
+  <div class="form-group{% if field.errors %} has-error{%endif%}">
+    {% if field.type == "BooleanField" %}
+        {{ field.label(class="col-sm-6 control-label") }}{{ render_checkbox_field_control(field, **kwargs) }}
+    {% elif field.type == "FileField" %}
+        {{ field.label(class="col-sm-6 control-label") }}{{ render_file_field_control(field, **kwargs) }}
+    {% else %}
+        {{ field.label(class="col-sm-6 control-label") }}{{ render_field_control(field, **kwargs) }}
+    {% endif %}
+  </div>
+  {{ render_errors(field)}}
+{% endmacro %}
+
+{% macro render_checkbox_field_control(field) %}
+    <div class="col-sm-6">
+        {{ field(class="checkbox", **kwargs)|safe }}
+    </div>
+{% endmacro %}
+
+{% macro render_splitdate_field(name, day_field, month_field, year_field) %}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">{{ name }}</label>
+    <div class="col-sm-9">
+        {{ day_field(class="form-control day-form-control", **kwargs)|safe }}
+        {{ month_field(class="form-control month-form-control", **kwargs)|safe }}
+        {{ year_field(class="form-control year-form-control", **kwargs)|safe }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro render_field_control(field) %}
+    <div class="col-sm-6">
+        {{ field(class="form-control", **kwargs)|safe }}
+    </div>
+{% endmacro %}
+
+{% macro render_file_field_control(field) %}
+    <div class="col-sm-6">
+        {{ field(**kwargs)|safe }}
+    </div>
+{% endmacro %}
+
+{% macro render_field_short_label(field) %}
+  <div class="form-group{% if field.errors %} has-error{%endif%}">
+    {% if field.type == "BooleanField" %}
+        {{ field.label(class="col-sm-3 control-label") }}{{ render_checkbox_field_control_short_label(field, **kwargs) }}
+    {% elif field.type == "FileField" %}
+        {{ field.label(class="col-sm-3 control-label") }}{{ render_file_field_control_short_label(field, **kwargs) }}
+    {% else %}
+        {{ field.label(class="col-sm-3 control-label") }}{{ render_field_control_short_label(field, **kwargs) }}
+    {% endif %}
+  </div>
+  {{ render_errors(field)}}
+{% endmacro %}
+
+{% macro render_checkbox_field_control_short_label(field) %}
+    <div class="col-sm-9">
+        {{ field(class="checkbox", **kwargs)|safe }}
+    </div>
+{% endmacro %}
+
+{% macro render_field_control_short_label(field) %}
+    <div class="col-sm-9">
+        {{ field(class="form-control", **kwargs)|safe }}
+    </div>
+{% endmacro %}
+
+{% macro render_file_field_control_short_label(field) %}
+    <div class="col-sm-9">
+        {{ field(**kwargs)|safe }}
+    </div>
+{% endmacro %}
+
+{% macro render_naked_field_control(field) %}
+    {{ field(class="form-control", **kwargs)|safe }}
+{% endmacro %}
+
+{% macro render_errors(field) %}
+  {% if field.errors %}
+    <div class="alert alert-danger">
+    {% for error in field.errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_control_cell(field) %}
+  <td {% if field.errors %}class="has-error"{%endif%}>
+      {{ field(class="form-control", **kwargs)|safe }}
+      {{ render_errors(field) }}
+  </td>
+{% endmacro %}
+
+{% macro render_pagination(pagination, endpoint) %}
+  {% if pagination.pages > 1 %}
+    <ul class="pagination">
+    {% if pagination.has_prev %}
+      <li><a href="{{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}" rel="prev">Previous</a></li>
+    {% else %}
+      <li class="disabled"><a>Previous</a></li>
+    {% endif %}
+
+    {%- for page in pagination.iter_pages(left_edge=1, left_current=2, right_current=3, right_edge=1) %}
+      {% if page %}
+        {% if page != pagination.page %}
+          <li><a href="{{ url_for(endpoint, page=page, **kwargs) }}">{{ page }}</a></li>
+        {% else %}
+          <li class="active"><a>{{ page }}</a></li>
+        {% endif %}
+      {% else %}
+        <li class="disabled"><a>…</a></li>
+      {% endif %}
+    {%- endfor %}
+
+    {% if pagination.has_next %}
+      <li><a href="{{ url_for(endpoint, page=pagination.next_num, **kwargs) }}" rel="next">Next</a></li>
+    {% else %}
+      <li class="disabled"><a>Next</a></li>
+    {% endif %}
+    </ul>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_search(searchForm, searchview, buttons) %}
+<form method="GET" class="form-horizontal" action="{{ url_for(searchview, **kwargs) }}">
+  <div class="input-group">
+      {{ searchForm.search(class="form-control") | safe }}
+      <div class="input-group-btn">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a class="btn btn-primary" href="{{ url_for(searchview, **kwargs) }}">Clear Search</a>
+
+        {% for key, value in buttons.items() %}
+          <a class="btn btn-primary" href="{{ url_for(value, **kwargs) }}">{{ key }}</a>
+        {% endfor %}
+      </div>
+  </div>
+</form>
+{% endmacro %}

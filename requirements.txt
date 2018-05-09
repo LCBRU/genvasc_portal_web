@@ -1,0 +1,16 @@
+Flask
+Flask-SQLAlchemy
+Jinja2
+MarkupSafe
+SQLAlchemy
+Werkzeug
+gunicorn
+itsdangerous
+mysqlclient
+Flask-WTF
+WTForms-Components
+flask-security
+pyyaml
+weasyprint
+Flask-WeasyPrint
+flask_mail

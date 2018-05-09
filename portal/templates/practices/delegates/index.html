@@ -1,0 +1,47 @@
+{% extends "practices/_practice_base.html" %}
+{% set tab = "delegates" %}
+{% import "_formHelpers.html" as formhelper %}
+
+{% block practice_content %}
+
+<div class="page-header">
+  {{ formhelper.render_search(searchForm, 'delegates_index',{} , code=practice_registration.code) }}
+</div>
+
+<div class="list-group">
+  {% for d in delegates.items %}
+    <div class="list-group-item row">
+      <div class="col-xs-12">
+        <h4>{{ d.name }}</h4>
+        <dl class="inline col-md-6">
+            <dt>Role</dt>
+            <dd>{{ d.role | blank_if_none}}</dd>
+            <dt>1&deg; Contact</dt>
+            <dd>{{ d.primary_contact_yn | yes_no }}</dd>
+            <dt>Email</dt>
+            <dd>{{ d.contact_email_add | blank_if_none}}</dd>
+            <dt>Phone</dt>
+            <dd>{{ d.gv_phone_a | blank_if_none}}</dd>
+            <dt></dt>
+            <dd>{{ d.gv_phone_b | blank_if_none}}</dd>
+        </dl>
+        <dl class="inline col-md-6">
+            <dt>GCP Trained</dt>
+            <dd>{{ d.gcp_training | yes_no }}</dd>
+            <dt>GENVASC Trained</dt>
+            <dd>{{ d.gv_trained | yes_no }}</dd>
+            <dt>On Delegation Log</dt>
+            <dd>{{ d.on_delegation_log_yn | yes_no }}</dd>
+            <dt>Start Date</dt>
+            <dd>{{ d.gv_start_del_log | date_format }}</dd>
+            <dt>End Date</dt>
+            <dd>{{ d.gv_end_del_log | date_format }}</dd>
+        </dl>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{{ formhelper.render_pagination(delegates, 'delegates_index', search=searchForm.search.data, code=practice_registration.code) }}
+
+{% endblock %}

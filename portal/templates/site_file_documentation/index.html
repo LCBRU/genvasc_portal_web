@@ -1,0 +1,27 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1>Site File Documentation</h1>
+</div>
+
+<ul>
+ <li>
+  <h3><a href="{{ url_for('site_file_documentation_approval') }}" title="Approval Documents">Approval Documents</a></h3>
+ </li>
+ <li>
+  <h3><a href="{{ url_for('site_file_documentation_personnel') }}" title="Personnel Log">Personnel Log, CVs and Study Training</a></h3>
+ </li>
+ <li>
+  <h3><a href="{{ url_for('site_file_documentation_sops') }}" title="SOPs">Protocol SOPs, Work Instructions and Deviation from Protocol Logs</a></h3>
+ </li>
+ <li>
+  <h3><a href="{{ url_for('site_file_documentation_admin') }}" title="Study Admin">Study Admin</a></h3>
+ </li>
+ <li>
+  <h3><a href="{{ url_for('site_file_documentation_documents') }}" title="Study Documents">Study Documents</a></h3>
+ </li>
+</ul>
+
+{% endblock %}
