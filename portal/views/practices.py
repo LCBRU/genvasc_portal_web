@@ -26,6 +26,8 @@ def practices_index():
         q = q.filter(
             or_(
                 Practice.name.like("%{}%".format(searchForm.search.data)),
+                Practice.address.like("%{}%".format(searchForm.search.data)),
+                Practice.partners.like("%{}%".format(searchForm.search.data)),
                 Practice.code == searchForm.search.data))
 
     registrations = (

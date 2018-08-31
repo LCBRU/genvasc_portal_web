@@ -12,6 +12,7 @@ class Practice(db.Model):
     name = db.Column(db.String, nullable=False)
     ccg_name = db.Column(db.String, nullable=True)
     address = db.Column(db.String, nullable=True)
+    partners = db.Column(db.String, nullable=True)
     delegates = db.relationship(
         "Delegate",
         back_populates="practice")
