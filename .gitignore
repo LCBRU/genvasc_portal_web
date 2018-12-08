@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -89,7 +89,6 @@ ENV/
 .ropeproject
 
 # Environment
-reports.env
 screenshot.png
 .vscode
-
+dev.sh

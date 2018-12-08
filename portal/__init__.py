@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from portal.config import BaseConfig
 from flask_wtf.csrf import CsrfProtect
 from flask_security import Security, SQLAlchemyUserDatastore
 import logging
@@ -11,7 +10,7 @@ from portal.utils import ResetPasswordForm, ChangePasswordForm, ReverseProxied
 
 app = Flask(__name__)
 app.wsgi_app = ReverseProxied(app.wsgi_app)
-app.config.from_object(BaseConfig)
+app.config.from_object('portal.config.BaseConfig')
 CsrfProtect(app)
 mail = Mail(app)
 
