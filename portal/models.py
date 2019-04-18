@@ -91,7 +91,7 @@ class User(db.Model, UserMixin):
 
     @property
     def full_name(self):
-        return '{} {}'.format(self.first_name or '', self.last_name or '')
+        return '{} {}'.format(self.first_name or '', self.last_name or '').strip() or self.email
 
 
 class PracticeRegistration(db.Model):

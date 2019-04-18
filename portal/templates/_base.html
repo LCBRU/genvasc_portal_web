@@ -3,54 +3,83 @@
 {% block base_content %}
 
 <div class="outer">
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="{{ url_for('index') }}">GENVASC GP Portal</a>
-      </div>
+  <header class="pageheader">
+      <h1>Leicester<br>
+          <span class="hidden-xs">Biomedical Research Centre</span>
+          <span class="hidden-sm hidden-md hidden-lg">BRC</span>
+      </h1>
+  </header>
 
-     {% if current_user.is_active %}
-          <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-              <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Documentation <span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-                      <li><a href="{{ url_for('site_file_documentation') }}">Site File Documentation</a></li>
-                      {% if current_user.is_admin() %}
-                        <li><a href="{{ url_for('site_file_documentation_study_admin') }}">Study Admin Team</a></li>
-                      {% endif %}
-                      <li role="separator" class="divider"></li>
-                      <li><a href="{{ url_for('help') }}">Help</a></li>
-                  </ul>
-              </li>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
 
-              <li><a href="{{ url_for('practices_index') }}">Practices</a></li>
+      {% set class="alert-info" %}
+      {% set gliph="glyphicon-info-sign" %}
 
-              {% if current_user.is_admin() %}
-                <li><a href="{{ url_for('submissions_index') }}">Submissions</a></li>
-              {% endif %}
-
-              <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User <span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="{{ url_for('security.change_password') }}">Change Password</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="{{ url_for('users_logout') }}">Log Out</a></li>
-                  </ul>
-              </li>
-            </ul>
-          </div>
+      {% if category == "warning" %}
+        {% set class="alert-warning" %}
+        {% set gliph="glyphicon-exclamation-sign" %}
+      {% elif category == "error" %}
+        {% set class="alert-danger" %}
+        {% set gliph="glyphicon-exclamation-sign" %}
+      {% elif category == "success" %}
+        {% set class="alert-success" %}
+        {% set gliph="glyphicon-ok" %}
       {% endif %}
-    </div>
+
+
+      <div class="alert {{class}}" role="alert">
+        <span class="glyphicon {{gliph}}" aria-hidden="true"></span>
+        <span class="sr-only">{{category}}:</span>
+        {{message}}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="alert alert-warning" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Warning:</span>
+        Important message to all recruiting sites.
+        Patients attending their 5 year follow-up health
+        check who are already GENVASC participants cannot
+        be recruited a second time. Duplicate recruits
+        will be excluded and you will not be reimbursed for their samples.
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    {% if current_user.is_active %}
+      <ul class="nav navbar-nav">
+        <li><a class="navbar-brand fas fa-home" href="{{ url_for('index') }}"></a></li>
+        {% if current_user.is_admin() %}
+          <li><a href="{{ url_for('submissions_index') }}">Submissions</a></li>
+        {% endif %}
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Documentation <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="{{ url_for('site_file_documentation') }}">Site File Documentation</a></li>
+                  {% if current_user.is_admin() %}
+                    <li><a href="{{ url_for('site_file_documentation_study_admin') }}">Study Admin Team</a></li>
+                  {% endif %}
+                  <li role="separator" class="divider"></li>
+                  <li><a href="{{ url_for('help') }}">Help</a></li>
+              </ul>
+          </li>
+          <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.full_name }} <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for_security('change_password') }}">Change Password</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{{ url_for_security('logout') }}">Log Out</a></li>
+              </ul>
+          </li>
+        </ul>
+      {% endif %}
   </nav>
 
-  <div class="container">
+  <div>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
 
@@ -69,26 +98,24 @@
           {% endif %}
 
 
-          <div class="alert {{class}}" role="alert">
-            <span class="glyphicon {{gliph}}" aria-hidden="true"></span>
-            <span class="sr-only">{{category}}:</span>
-            {{message}}
+          <div class="row">
+              <div class="alert {{class}} col-xs-6 col-md-6 col-md-offset-3" role="alert">
+                  <span class="glyphicon {{gliph}}" aria-hidden="true"></span>
+                  <span class="sr-only">{{category}}:</span>
+                  {{message}}
+              </div>
           </div>
         {% endfor %}
       {% endwith %}
       
-      <div class="alert alert-warning" role="alert">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only">Warning:</span>
-            Important message to all recruiting sites.
-            Patients attending their 5 year follow-up health
-            check who are already GENVASC participants cannot
-            be recruited a second time. Duplicate recruits
-            will be excluded and you will not be reimbursed for their samples.
-      </div>
-
       {% block content %}{% endblock %}
-  </div>
+
+    </div>
+
+    <footer>
+        <p>
+            Copyright &copy; 2018 NIHR Leicester Biomedical Research Centre
+        </p>
+    </footer>
 </div>
 {% endblock %}
-

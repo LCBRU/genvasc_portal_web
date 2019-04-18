@@ -8,39 +8,53 @@
   {{ formhelper.render_search(searchForm, 'recruits_index',{} , code=practice_registration.code) }}
 </div>
 
-<div class="list-group">
+<ul class="list-group">
   {% for r in recruits.items %}
-    <div class="list-group-item row">
-      <div class="col-xs-12">
-        <h4>{{ r.status.full_name }}</h4>
-        <dl class="inline col-md-6">
+    <li class="list-group-item">
+      <h4>{{ r.status.full_name }}</h4>
+      <dl>
+        <div>
             <dt>NHS Number</dt>
             <dd>{{ r.nhs_number }}</dd>
+        </div>
+        <div>
             <dt>Date of Birth</dt>
             <dd>{{ r.date_of_birth | date_format }}</dd>
+        </div>
+        <div>
             <dt>Recruited</dt>
             <dd>{{ r.date_recruited | date_format }}</dd>
-            {% if not r.user.is_system %}
-              <dt>Recruited By</dt>
-              <dd>{{ r.user.full_name }}</dd>
-            {% endif %}
-        </dl>
-        <dl class="inline col-md-6">
-            <dt>Status</dt>
-            <dd>{{ r.status.status | default_if_none('Created') }}</dd>
-            <dt>Study ID</dt>
-            <dd>{{ r.status.study_id | blank_if_none }}</dd>
-            <dt>Processed</dt>
-            <dd>{{ r.status.processed_date | date_format }}</dd>
-            <dt>Invoice</dt>
-            <dd>{{ r.status.invoice_period | default_if_none('Not Invoiced') }}</dd>
-            <dt>Submitted for Reimbursement</dt>
-            <dd>{{ r.status.reimbursed_status | blank_if_none }}</dd>
-        </dl>
-      </div>
-    </div>
+        </div>
+        {% if not r.user.is_system %}
+          <div>
+            <dt>Recruited By</dt>
+            <dd>{{ r.user.full_name }}</dd>
+          </div>
+        {% endif %}
+        <div>
+          <dt>Status</dt>
+          <dd>{{ r.status.status | default_if_none('Created') }}</dd>
+        </div>
+        <div>
+          <dt>Study ID</dt>
+          <dd>{{ r.status.study_id | blank_if_none }}</dd>
+        </div>
+        <div>
+          <dt>Processed</dt>
+          <dd>{{ r.status.processed_date | date_format }}</dd>
+        </div>
+        <div>
+          <dt>Invoice</dt>
+          <dd>{{ r.status.invoice_period | default_if_none('Not Invoiced') }}</dd>
+        </div>
+        <div>
+          <dt>Submitted for Reimbursement</dt>
+          <dd>{{ r.status.reimbursed_status | blank_if_none }}</dd>
+        </div>
+      </dl>
+    </li>
   {% endfor %}
-</div>
+  </ul>
 
 {{ formhelper.render_pagination(recruits, 'recruits_index', search=searchForm.search.data, code=practice_registration.code) }}
 

@@ -1,96 +1,85 @@
-{% macro render_field(field) %}
-  <div class="form-group{% if field.errors %} has-error{%endif%}">
-    {% if field.type == "BooleanField" %}
-        {{ field.label(class="col-sm-6 control-label") }}{{ render_checkbox_field_control(field, **kwargs) }}
-    {% elif field.type == "FileField" %}
-        {{ field.label(class="col-sm-6 control-label") }}{{ render_file_field_control(field, **kwargs) }}
-    {% else %}
-        {{ field.label(class="col-sm-6 control-label") }}{{ render_field_control(field, **kwargs) }}
-    {% endif %}
+{% macro render_field(field, label=None) %}
+  <div class="row">
+    <div class="form-group{% if field.errors %} has-error{%endif%} col-md-offset-1 col-md-10">
+        {% if field.type == "HiddenField" or field.type == "CSRFTokenField" %}
+        {% elif field.type == "BooleanField" %}
+            {{ field.label(class="control-label", text=label) }}{{ render_checkbox_field_control(field, **kwargs) }}
+        {% elif field.type == "RadioField" %}
+            {{ field.label(class="control-label", text=label) }}{{ render_radio_field_control(field, **kwargs) }}
+        {% else %}
+            {{ field.label(class="control-label", text=label) }}{{ render_field_control(field, **kwargs) }}
+        {% endif %}
+    </div>
   </div>
-  {{ render_errors(field)}}
 {% endmacro %}
+
 
 {% macro render_checkbox_field_control(field) %}
-    <div class="col-sm-6">
-        {{ field(class="checkbox", **kwargs)|safe }}
-    </div>
+    {{ field(class="checkbox", **kwargs)|safe }}
 {% endmacro %}
 
-{% macro render_splitdate_field(name, day_field, month_field, year_field) %}
-  <div class="form-group">
-    <label class="col-sm-3 control-label">{{ name }}</label>
-    <div class="col-sm-9">
-        {{ day_field(class="form-control day-form-control", **kwargs)|safe }}
-        {{ month_field(class="form-control month-form-control", **kwargs)|safe }}
-        {{ year_field(class="form-control year-form-control", **kwargs)|safe }}
-    </div>
-  </div>
+
+{% macro render_radio_field_control(field) %}
+    {{ field(class="radio", **kwargs)|safe }}
 {% endmacro %}
+
 
 {% macro render_field_control(field) %}
-    <div class="col-sm-6">
-        {{ field(class="form-control", **kwargs)|safe }}
-    </div>
-{% endmacro %}
-
-{% macro render_file_field_control(field) %}
-    <div class="col-sm-6">
-        {{ field(**kwargs)|safe }}
-    </div>
-{% endmacro %}
-
-{% macro render_field_short_label(field) %}
-  <div class="form-group{% if field.errors %} has-error{%endif%}">
-    {% if field.type == "BooleanField" %}
-        {{ field.label(class="col-sm-3 control-label") }}{{ render_checkbox_field_control_short_label(field, **kwargs) }}
-    {% elif field.type == "FileField" %}
-        {{ field.label(class="col-sm-3 control-label") }}{{ render_file_field_control_short_label(field, **kwargs) }}
-    {% else %}
-        {{ field.label(class="col-sm-3 control-label") }}{{ render_field_control_short_label(field, **kwargs) }}
-    {% endif %}
-  </div>
-  {{ render_errors(field)}}
-{% endmacro %}
-
-{% macro render_checkbox_field_control_short_label(field) %}
-    <div class="col-sm-9">
-        {{ field(class="checkbox", **kwargs)|safe }}
-    </div>
-{% endmacro %}
-
-{% macro render_field_control_short_label(field) %}
-    <div class="col-sm-9">
-        {{ field(class="form-control", **kwargs)|safe }}
-    </div>
-{% endmacro %}
-
-{% macro render_file_field_control_short_label(field) %}
-    <div class="col-sm-9">
-        {{ field(**kwargs)|safe }}
-    </div>
-{% endmacro %}
-
-{% macro render_naked_field_control(field) %}
     {{ field(class="form-control", **kwargs)|safe }}
 {% endmacro %}
 
-{% macro render_errors(field) %}
-  {% if field.errors %}
-    <div class="alert alert-danger">
-    {% for error in field.errors %}
-      <p>{{ error }}</p>
-    {% endfor %}
-    </div>
-  {% endif %}
+
+{% macro render_button_bar(cancelview) %}
+      <div class="form-group text-right">
+          <div>
+              <a href="{{ url_for(cancelview) }}" class="btn btn-default" role="button">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+      </div>
 {% endmacro %}
 
-{% macro render_control_cell(field) %}
-  <td {% if field.errors %}class="has-error"{%endif%}>
-      {{ field(class="form-control", **kwargs)|safe }}
-      {{ render_errors(field) }}
-  </td>
+
+{% macro render_form_errors(form) %}
+    {% for field in form %}
+      {% if field.errors %}
+        <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <p>{{ field.label }} has the following errors:</p>
+            <ul>
+            {% for error in field.errors%}
+                <li>{{ error }}</li>
+            {% endfor %}
+            </ul>
+          </div>
+      {% endif %}
+    {% endfor %}
+
 {% endmacro %}
+
+
+{% macro render_search(searchForm, searchview, buttons={}, checkboxes={}) %}
+<form method="GET" class="form-horizontal" action="{{ url_for(searchview, **kwargs) }}">
+
+  <div class="input-group">
+      {{ searchForm.search(class="form-control", placeholder="enter search text - searches study number, protocol deviation and comments") | safe }}
+      {% for key, value in checkboxes.items() %}
+        <span class="input-group-addon">
+            <input type="checkbox" id="{{ key }}" aria-label="{{ value }}">
+            <span>{{ value }}</span>
+        </span>
+      {% endfor %}
+      <div class="input-group-btn">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a class="btn btn-primary" href="{{ url_for(searchview, **kwargs) }}">Clear Search</a>
+
+        {% for key, value in buttons.items() %}
+          <a class="btn btn-primary" href="{{ url_for(value, **kwargs) }}">{{ key }}</a>
+        {% endfor %}
+      </div>
+  </div>
+</form>
+{% endmacro %}
+
 
 {% macro render_pagination(pagination, endpoint) %}
   {% if pagination.pages > 1 %}
@@ -120,20 +109,4 @@
     {% endif %}
     </ul>
   {% endif %}
-{% endmacro %}
-
-{% macro render_search(searchForm, searchview, buttons) %}
-<form method="GET" class="form-horizontal" action="{{ url_for(searchview, **kwargs) }}">
-  <div class="input-group">
-      {{ searchForm.search(class="form-control") | safe }}
-      <div class="input-group-btn">
-        <button type="submit" class="btn btn-primary">Search</button>
-        <a class="btn btn-primary" href="{{ url_for(searchview, **kwargs) }}">Clear Search</a>
-
-        {% for key, value in buttons.items() %}
-          <a class="btn btn-primary" href="{{ url_for(value, **kwargs) }}">{{ key }}</a>
-        {% endfor %}
-      </div>
-  </div>
-</form>
 {% endmacro %}
