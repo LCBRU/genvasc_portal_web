@@ -2,8 +2,7 @@
     Your password has been changed for the GENVASC Portal.
 
     {% if security.recoverable %}
-        {{ ('If you did not change your password, click the link below to reset it.') }}
-        {{ url_for_security('forgot_password', _external=True) }}
+        <a href='{{ url_for_security('forgot_password', _external=True) }}'>If you did not change your password, click here to reset it.</a>
     {% endif %}
 </p>
 

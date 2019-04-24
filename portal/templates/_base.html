@@ -10,32 +10,6 @@
       </h1>
   </header>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-
-      {% set class="alert-info" %}
-      {% set gliph="glyphicon-info-sign" %}
-
-      {% if category == "warning" %}
-        {% set class="alert-warning" %}
-        {% set gliph="glyphicon-exclamation-sign" %}
-      {% elif category == "error" %}
-        {% set class="alert-danger" %}
-        {% set gliph="glyphicon-exclamation-sign" %}
-      {% elif category == "success" %}
-        {% set class="alert-success" %}
-        {% set gliph="glyphicon-ok" %}
-      {% endif %}
-
-
-      <div class="alert {{class}}" role="alert">
-        <span class="glyphicon {{gliph}}" aria-hidden="true"></span>
-        <span class="sr-only">{{category}}:</span>
-        {{message}}
-      </div>
-    {% endfor %}
-  {% endwith %}
-
   <div class="alert alert-warning" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
     <span class="sr-only">Warning:</span>
