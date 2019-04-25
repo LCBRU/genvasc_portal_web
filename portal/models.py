@@ -220,4 +220,5 @@ class Delegate(db.Model):
     gv_phone_a = db.Column(db.String(100))
     gv_phone_b = db.Column(db.String(100))
     contact_email_add = db.Column(db.String(500))
+    user = db.relationship('User', foreign_keys=[contact_email_add], primaryjoin='User.email == Delegate.contact_email_add')
     primary_contact_yn = db.Column(db.Boolean)

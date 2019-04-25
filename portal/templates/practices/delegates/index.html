@@ -5,7 +5,7 @@
 {% block practice_content %}
 
 <div class="page-header">
-  {{ formhelper.render_search(searchForm, 'delegates_index',{} , code=practice_registration.code) }}
+  {{ formhelper.render_search(searchForm, 'delegates_index',{'PDF': 'delegates_pdf'} , code=practice_registration.code) }}
 </div>
 
 <ul class="list-group">
@@ -49,6 +49,10 @@
           <div>
             <dt>End Date</dt>
             <dd>{{ d.gv_end_del_log | date_format }}</dd>
+          </div>
+          <div>
+            <dt>Last Login</dt>
+            <dd>{{ d.user.last_login_at | date_format }}</dd>
           </div>
         </dl>
     </li>

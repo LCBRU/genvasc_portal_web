@@ -1,0 +1,100 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>{{ practice_registration.practice.name }}</title>
+
+  <style>
+  	@page {
+  		size: A4 landscape;
+
+	    @bottom-right {
+	        content: "Page " counter(page)
+	                 " of " counter(pages);
+	        font-size: 10px;
+	    }                 
+
+	    @bottom-left {
+	        content: "Downloaded: {{ now | datetime_format }}";
+	        font-size: 10px;
+	    }
+  	}
+
+  	body {
+  		font-family: Arial, Helvetica, sans-serif;
+  	}
+
+  	h1, h2 {
+  		margin: 0;
+  		text-align: center;
+  	}
+
+  	h1 {
+  		font-style: italic;
+  	}
+
+  	h2 {
+  		color: #777;
+  	}
+
+    table {
+        width: 100%;
+    }
+
+  	table td, table th {
+  		padding: 5px 10px;
+  	}
+
+  	table.staff {
+  		border: 1px solid #000;
+		border-collapse:collapse;
+  	}
+
+  	table.staff tr {
+  		border: 1px solid #000;
+  	}
+    
+    table.staff p {
+        padding: 0;
+        margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+	<h1>{{ practice_registration.practice.name }}</h1>
+	<h2>Staff</h2>
+
+	<table class="staff">
+		<tbody>
+			{% for d in delegates %}
+				<tr>
+					<td>
+                        <p>{{ d.name }}</p>
+                        <p>{{ d.role | blank_if_none}}</p>
+                        <p>{{ d.contact_email_add | blank_if_none}}</p>
+                        <p>{{ d.gv_phone_a | blank_if_none}}</p>
+                        <p>{{ d.gv_phone_b | blank_if_none}}</p>
+                    </td>
+					<td>
+                        <p><strong>1&deg; Contact:</strong> {{ d.primary_contact_yn | yes_no }}</p>                        
+                        <p><strong>GCP Trained:</strong> {{ d.gcp_training | yes_no }}</p>                        
+                        <p><strong>GENVASC Trained:</strong> {{ d.gv_trained | yes_no }}</p>                        
+                        <p><strong>Delegation Log:</strong> {{ d.on_delegation_log_yn | yes_no }}</p>                        
+                    </td>
+					<td>
+                        <p><strong>Start Date:</strong> {{ d.gv_start_del_log | date_format }}</p>
+                        <p><strong>End Date:</strong> {{ d.gv_end_del_log | date_format }}</p>
+                        <p><strong>Last Login:</strong> {{ d.user.last_login_at | date_format }}</p>
+                    </td>
+				</tr>
+            {% endfor %}
+		</tbody>
+	</table>
+
+
+</body>
+</html>
