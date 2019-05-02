@@ -68,4 +68,3 @@ def delegates_pdf(code):
         practice_registration.code,
         practice_registration.practice.name,
     ))
-
