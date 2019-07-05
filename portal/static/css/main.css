@@ -125,14 +125,8 @@ dd {
   padding: 0;
 }
 
-.login-form-body {
-  display: flex;
-  align-items: stretch;
-}
-
 .login-form-body form {
   width: 500px;
-  flex: 1;
 }
 
 .login-form-body .description {
