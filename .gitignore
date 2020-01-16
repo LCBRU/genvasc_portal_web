@@ -91,4 +91,4 @@ ENV/
 # Environment
 screenshot.png
 .vscode
-dev.env
+database.sqlite3
