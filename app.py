@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
-from portal import app
+from dotenv import load_dotenv
+
+# Load environment variables from '.env' file.
+load_dotenv()
+
+from portal import create_app
+
+application = create_app()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000)
+    application.run(host="0.0.0.0", port=8000)

@@ -1,5 +1,10 @@
 import os
 
+from dotenv import load_dotenv
+
+# Load environment variables from '.env' file.
+load_dotenv()
+
 
 class BaseConfig(object):
     MAIL_SERVER = os.environ['MAIL_SERVER']
@@ -17,7 +22,12 @@ class BaseConfig(object):
     SECURITY_TRACKABLE = os.environ['GGPP_SECURITY_TRACKABLE'] == 'True'
     SMTP_SERVER = 'localhost'
     APPLICATION_EMAIL_ADDRESS = os.environ['LCBRUIT_EMAIL_ADDRESS']
-    ADMIN_EMAIL_ADDRESSES = os.environ['ADMIN_EMAIL_ADDRESS']
     ERROR_EMAIL_SUBJECT = 'GENVASC Portal Error'
     SECURITY_CHANGEABLE = True
     SECURITY_RECOVERABLE = True
+    MAIL_DEFAULT_SENDER = os.environ["LCBRUIT_EMAIL_ADDRESS"]
+
+    ADMIN_EMAIL_ADDRESS = os.environ['ADMIN_EMAIL_ADDRESS']
+    ADMIN_FIRST_NAME = os.environ['ADMIN_FIRST_NAME']
+    ADMIN_LAST_NAME = os.environ['ADMIN_LAST_NAME']
+    ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']

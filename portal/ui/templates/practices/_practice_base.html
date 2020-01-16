@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% import "_formHelpers.html" as formhelper %}
+
+{% block content %}
+
+  <div class="page-header">
+    <h1>{{ practice_registration.practice.code }}: {{ practice_registration.practice.name }}</h1>
+  </div>
+
+  <ul class="nav nav-tabs">
+    <li role="presentation" {% if tab == 'recruits' %}class="active"{% endif %}>
+      <a href="{{ url_for('ui.recruits_index', code=practice_registration.code) }}"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"> Recruits</span></a>
+    </li>
+    <li role="presentation" {% if tab == 'reimbursements' %}class="active"{% endif %}>
+      <a href="{{ url_for('ui.reimbursements_index', code=practice_registration.code) }}"><span class="glyphicon glyphicon-gbp" aria-hidden="true"> Submissions</span></a>
+    </li>
+    <li role="presentation" {% if tab == 'delegates' %}class="active"{% endif %}>
+      <a href="{{ url_for('ui.delegates_index', code=practice_registration.code) }}"><span class="glyphicon glyphicon-user" aria-hidden="true"> Staff</span></a>
+    </li>
+  </ul>
+
+<section class='tab'>
+      {% block practice_content %}{% endblock %}
+</section>
+
+{% endblock %}

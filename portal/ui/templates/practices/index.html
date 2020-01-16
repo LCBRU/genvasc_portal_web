@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+{% import "_formHelpers.html" as formhelper %}
+
+{% block content %}
+
+<div>
+  <div>
+      <section>
+        <h1>Practices</h1>
+        {{ formhelper.render_search(searchForm, 'ui.practices_index', {}) }}
+      </section>                
+  </div>
+  <div>
+      {% if registrations.items | length > 0 %}
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Code</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for r in registrations.items %}
+              <tr>
+                <td>
+                    <a class="btn btn-default" href="{{ url_for('ui.recruits_index', code=r.code) }}"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"> Recruits</span></a>
+                </td>
+                <td>{{r.practice.code}}</td>
+                <td>{{r.practice.name}}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>      
+        
+      {% endif %}
+
+  </div>
+
+  {{ formhelper.render_pagination(registrations, 'ui.practices_index', search=searchForm.search.data) }}
+
+</div>
+
+{% endblock %}

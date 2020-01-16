@@ -1,72 +1,6 @@
-import string
-from wtforms import PasswordField, SubmitField
-from flask_security.forms import (EqualTo, password_length, password_required,
-                                  get_form_field_label, ValidatorMixin, Form,
-                                  PasswordFormMixin)
-from wtforms.validators import ValidationError
-from flask_security.utils import verify_and_update_password, get_message
-from flask_login import current_user
-
-
-class PasswordPolicy(ValidatorMixin):
-    def __init__(self, message=u'The password must contain a lowercase, '
-                 'uppercase and punctuation character'):
-        self.message = message
-
-    def __call__(self, form, field):
-        value = set(field.data)
-
-        if (value.isdisjoint(string.ascii_lowercase) or
-           value.isdisjoint(string.ascii_uppercase) or
-           value.isdisjoint(string.punctuation)):
-            raise ValidationError(self.message)
-
-
-class NewPasswordFormMixin():
-    password = PasswordField(
-        get_form_field_label('password'),
-        validators=[password_required, password_length, PasswordPolicy()])
-
-
-class PasswordConfirmFormMixin():
-    password_confirm = PasswordField(
-        get_form_field_label('retype_password'),
-        validators=[EqualTo('password', message='RETYPE_PASSWORD_MISMATCH'),
-                    password_required])
-
-
-class ResetPasswordForm(Form, NewPasswordFormMixin, PasswordConfirmFormMixin):
-    """The default reset password form"""
-
-    submit = SubmitField(get_form_field_label('reset_password'))
-
-
-class ChangePasswordForm(Form, PasswordFormMixin):
-    """The default change password form"""
-
-    new_password = PasswordField(
-        get_form_field_label('new_password'),
-        validators=[password_required, password_length, PasswordPolicy()])
-
-    new_password_confirm = PasswordField(
-        get_form_field_label('retype_password'),
-        validators=[EqualTo('new_password',
-                            message='RETYPE_PASSWORD_MISMATCH'),
-                    password_required])
-
-    submit = SubmitField(get_form_field_label('change_password'))
-
-    def validate(self):
-        if not super(ChangePasswordForm, self).validate():
-            return False
-
-        if not verify_and_update_password(self.password.data, current_user):
-            self.password.errors.append(get_message('INVALID_PASSWORD')[0])
-            return False
-        if self.password.data.strip() == self.new_password.data.strip():
-            self.password.errors.append(get_message('PASSWORD_IS_THE_SAME')[0])
-            return False
-        return True
+import traceback
+from portal.emailing import email
+from flask import current_app
 
 
 class ReverseProxied(object):
@@ -108,3 +42,11 @@ class ReverseProxied(object):
         return self.app(environ, start_response)
 
 
+def log_exception(e):
+    print(traceback.format_exc())
+    current_app.logger.error(traceback.format_exc())
+    email(
+        subject=current_app.config["ERROR_EMAIL_SUBJECT"],
+        message=traceback.format_exc(),
+        recipients=current_app.config["ADMIN_EMAIL_ADDRESS"].split(";"),
+    )

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import uuid
 from portal import db
 from flask_security import UserMixin, RoleMixin
@@ -15,7 +15,8 @@ class Practice(db.Model):
     partners = db.Column(db.String, nullable=True)
     delegates = db.relationship(
         "Delegate",
-        back_populates="practice")
+        back_populates="practice",
+    )
 
 
 class Role(db.Model, RoleMixin):
@@ -24,10 +25,6 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
-
-    def __init__(self, *args, **kwargs):
-        self.name = kwargs.get('name')
-        self.description = kwargs.get('description')
 
 
 roles_users = db.Table(
@@ -76,13 +73,6 @@ class User(db.Model, UserMixin):
         secondary=practice_registrations_users,
         backref=db.backref('users', lazy='dynamic'))
 
-    def __init__(self, *args, **kwargs):
-        self.email = kwargs.get('email')
-        self.password = kwargs.get('password')
-        self.first_name = kwargs.get('first_name')
-        self.last_name = kwargs.get('last_name')
-        self.active = 0
-
     def is_admin(self):
         return self.has_role(Role.ADMIN_ROLENAME)
 
@@ -98,12 +88,8 @@ class PracticeRegistration(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, db.ForeignKey(Practice.code))
-    date_created = db.Column(db.DateTime, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     practice = db.relationship(Practice)
-
-    def __init__(self, *args, **kwargs):
-        self.code = kwargs.get('code')
-        self.date_created = datetime.datetime.now()
 
 
 class StaffMember(db.Model):
@@ -114,16 +100,10 @@ class StaffMember(db.Model):
         db.ForeignKey(PracticeRegistration.id))
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     practice_registration = db.relationship(
         PracticeRegistration,
         backref=db.backref('staff', cascade="all, delete-orphan"))
-
-    def __init__(self, *args, **kwargs):
-        self.practice_registration_id = kwargs.get('practice_registration').id
-        self.first_name = kwargs.get('first_name')
-        self.last_name = kwargs.get('last_name')
-        self.date_created = datetime.datetime.now()
 
     def full_name(self):
         return '{} {}'.format(self.first_name or '', self.last_name or '')
@@ -145,20 +125,12 @@ class Recruit(db.Model):
     nhs_number = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     date_recruited = db.Column(db.Date, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     status = db.relationship(
         "RecruitStatus",
         uselist=False,
-        back_populates="recruit")
-
-    def __init__(self, *args, **kwargs):
-        self.practice_registration_id = kwargs.get('practice_registration').id
-        self.user_id = kwargs.get('user').id
-        self.nhs_number = kwargs.get('nhs_number')
-        self.date_of_birth = kwargs.get('date_of_birth')
-        self.date_recruited = kwargs.get('date_recruited')
-        self.date_created = datetime.datetime.now()
-        self.id = uuid.uuid1()
+        back_populates="recruit",
+    )
 
     @property
     def date_of_birth_day(self):
@@ -197,7 +169,8 @@ class RecruitStatus(db.Model):
     def invoice_period(self):
         return '{} {}'.format(
             self.invoice_year or '',
-            self.invoice_quarter or '')
+            self.invoice_quarter or '',
+        )
 
 
 class Delegate(db.Model):
@@ -207,7 +180,8 @@ class Delegate(db.Model):
     practice_code = db.Column(
         db.String,
         db.ForeignKey(Practice.code),
-        primary_key=True)
+        primary_key=True,
+    )
     practice = db.relationship(Practice, back_populates="delegates")
     instance = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500))

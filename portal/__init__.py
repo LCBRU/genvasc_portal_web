@@ -1,51 +1,33 @@
-from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CsrfProtect
-from flask_security import Security, SQLAlchemyUserDatastore
 import logging
-import traceback
-from flask_mail import Mail
-from portal.utils import ResetPasswordForm, ChangePasswordForm, ReverseProxied
+from flask import Flask
+from .config import BaseConfig
+from .database import db
+from .emailing import init_mail
+from .template_filters import init_template_filters
+from .standard_views import init_standard_views
+from .security import init_security, init_users
+from .utils import ReverseProxied
+from .ui import blueprint as ui_blueprint
 
 
-app = Flask(__name__)
-app.wsgi_app = ReverseProxied(app.wsgi_app)
-app.config.from_object('portal.config.BaseConfig')
-CsrfProtect(app)
-mail = Mail(app)
+def create_app(config=BaseConfig):
+    app = Flask(__name__)
+    app.wsgi_app = ReverseProxied(app.wsgi_app)
+    app.config.from_object(config)
+    app.config.from_pyfile("application.cfg", silent=True)
 
+    with app.app_context():
+        app.logger.setLevel(logging.INFO)
+        db.init_app(app)
+        init_mail(app)
+        init_template_filters(app)
+        init_standard_views(app)
+        init_security(app)
 
-if not app.debug:
-    import logging
-    from logging.handlers import SMTPHandler
-    mail_handler = SMTPHandler(app.config['SMTP_SERVER'],
-                               app.config['APPLICATION_EMAIL_ADDRESS'],
-                               app.config['ADMIN_EMAIL_ADDRESSES'],
-                               app.config['ERROR_EMAIL_SUBJECT'])
-    mail_handler.setLevel(logging.ERROR)
-    app.logger.addHandler(mail_handler)
+    app.register_blueprint(ui_blueprint)
 
+    @app.before_first_request
+    def init_data():
+        init_users()
 
-@app.errorhandler(500)
-@app.errorhandler(Exception)
-def internal_error(exception):
-    print(traceback.format_exc())
-    app.logger.error(traceback.format_exc())
-    return render_template('500.html'), 500
-
-
-# Set up database
-db = SQLAlchemy(app)
-
-import portal.database
-database.init_db()
-
-from portal.models import *
-
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore,
-                    reset_password_form=ResetPasswordForm,
-                    change_password_form=ChangePasswordForm)
-
-from portal.views import *
-import portal.security
+    return app
