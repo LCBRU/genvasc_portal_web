@@ -2,10 +2,9 @@ from flask import render_template, request
 from flask_security import login_required
 from flask_weasyprint import HTML, render_pdf
 from .. import blueprint
-from portal.models import *
-from portal.forms import *
-from portal.helpers import *
-from portal.datatypes import *
+from portal.models import PracticeRegistration, Delegate
+from ..forms import SearchForm
+from portal.helpers import must_exist
 
 
 @blueprint.route('/practices/<string:code>/delegates')

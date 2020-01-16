@@ -1,17 +1,16 @@
-import re
-import datetime
 import csv
-import tempfile
 import io
-from flask import render_template, request, redirect, url_for, flash, make_response
-from flask_security import login_required, current_user, roles_required
+from flask import render_template, make_response
+from flask_security import login_required, roles_required
 from sqlalchemy import func
 from .. import blueprint
 from portal.database import db
-from portal.models import *
-from portal.forms import *
-from portal.helpers import *
-from portal.datatypes import *
+from portal.models import (
+    RecruitStatus,
+    Recruit,
+    PracticeRegistration,
+)
+
 
 @blueprint.route('/submissions')
 @blueprint.route('/submissions?page=<int:page>')

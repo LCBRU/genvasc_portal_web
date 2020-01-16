@@ -2,9 +2,8 @@ from flask import render_template, request, redirect, url_for
 from flask_security import login_required, current_user
 from .. import blueprint
 from sqlalchemy import or_
-from portal.models import *
-from portal.forms import *
-from portal.helpers import *
+from portal.models import PracticeRegistration, Practice
+from ..forms import SearchForm
 
 
 @blueprint.route('/practices/')

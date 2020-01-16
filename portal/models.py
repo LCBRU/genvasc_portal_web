@@ -1,5 +1,4 @@
 from datetime import datetime
-import uuid
 from portal import db
 from flask_security import UserMixin, RoleMixin
 

@@ -1,12 +1,14 @@
-import re, datetime
-from flask import render_template, request, redirect, url_for, flash
-from flask_security import login_required, current_user
+import datetime
+from flask import render_template
+from flask_security import login_required
 from .. import blueprint
 from portal.database import db
-from portal.models import *
-from portal.forms import *
-from portal.helpers import *
-from portal.datatypes import *
+from portal.models import (
+    RecruitStatus,
+    PracticeRegistration,
+    Recruit,
+)
+from portal.helpers import must_exist
 from sqlalchemy import func
 from flask_weasyprint import HTML, render_pdf
 
@@ -47,6 +49,7 @@ def reimbursements_index(code, page=1):
 
     return render_template('practices/reimbursements/index.html', reimbursements=reimbursements, practice_registration=practice_registration)
 
+
 @blueprint.route('/practices/<string:code>/reimbursements/<string:invoice_year>/<string:invoice_quarter>')
 @blueprint.route('/practices/<string:code>/reimbursements/<string:invoice_year>/<string:invoice_quarter>?page=<int:page>')
 @login_required
@@ -74,6 +77,7 @@ def reimbursements_participants(code, invoice_year, invoice_quarter, page=1):
             error_out=False))
 
     return render_template('practices/reimbursements/participants.html', page=page, participants=participants, practice_registration=practice_registration, invoice_year=invoice_year, invoice_quarter=invoice_quarter)
+
 
 @blueprint.route('/practices/<string:code>/reimbursements/<string:invoice_year>/<string:invoice_quarter>/pdf')
 @login_required

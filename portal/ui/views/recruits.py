@@ -1,13 +1,12 @@
-import re, datetime
-from flask import render_template, request, redirect, url_for, flash
-from flask_security import login_required, current_user
+from flask import render_template, request
+from flask_security import login_required
 from .. import blueprint
 from portal.database import db
-from portal.models import *
-from portal.forms import *
-from portal.helpers import *
-from portal.datatypes import *
+from portal.models import Recruit, RecruitStatus, PracticeRegistration
+from ..forms import SearchForm
+from portal.helpers import must_exist
 from sqlalchemy import or_, func
+
 
 @blueprint.route('/practices/<string:code>/recruits')
 @blueprint.route('/practices/<string:code>')
