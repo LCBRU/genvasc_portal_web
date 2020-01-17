@@ -54,13 +54,24 @@ def import_ccg():
     ccgs = []
 
     with etl_practice_database() as p_db:
-        for p in p_db.execute(ccg_table.select()):
-            ccgs.append(
-                Ccg(
-                    project_id=p['project_id'],
-                    id=p['ccg_id'],
-                    name=p['name'],
+        for c in p_db.execute(ccg_table.select()):
+            ccg = Ccg.query.filter_by(
+                project_id=c['project_id'],
+                ccg_id=c['ccg_id'],
+            ).one_or_none()
+
+            if ccg is None:
+                ccg = Ccg(
+                    project_id=c['project_id'],
+                    ccg_id=c['ccg_id'],
                 )
-            )
+            
+            ccg.name = c['name']
+
+            ccgs.append(ccg)
 
     db.session.add_all(ccgs)
+    db.session.flush()
+    
+    updated_ccgs = Ccg.query.with_entities(Ccg.id).filter(Ccg.id.in_([c.id for c in ccgs])).subquery()
+    Ccg.query.filter(Ccg.id.notin_(updated_ccgs)).delete(synchronize_session='fetch')

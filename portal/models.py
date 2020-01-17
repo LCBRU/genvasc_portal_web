@@ -7,8 +7,10 @@ class Ccg(db.Model):
 
     __tablename__ = 'etl_ccg'
 
-    project_id = db.Column(db.Integer, primary_key=True)
+
     id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, nullable=False)
+    ccg_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
 
 

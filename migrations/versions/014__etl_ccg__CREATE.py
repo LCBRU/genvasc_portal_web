@@ -4,6 +4,7 @@ from sqlalchemy import (
     Column,
     Integer,
     NVARCHAR,
+    UniqueConstraint,
 )
 
 
@@ -16,9 +17,15 @@ def upgrade(migrate_engine):
     t = Table(
         "etl_ccg",
         meta,
-        Column("project_id", Integer, primary_key=True),
         Column("id", Integer, primary_key=True),
+        Column("project_id", Integer, primary_key=True),
+        Column("ccg_id", Integer, primary_key=True),
         Column("name", NVARCHAR(255), nullable=False),
+        UniqueConstraint(
+            'project_id',
+            'ccg_id',
+            name='uix__etl_ccg__project_id__ccg_id'
+        ),
     )
     t.create()
 
