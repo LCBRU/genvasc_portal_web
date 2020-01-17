@@ -92,3 +92,4 @@ ENV/
 screenshot.png
 .vscode
 database.sqlite3
+celerybeat.pid

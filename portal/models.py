@@ -9,6 +9,7 @@ class Practice(db.Model):
 
     code = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    ccg_id = db.Column(db.Integer, nullable=True)
     ccg_name = db.Column(db.String, nullable=True)
     address = db.Column(db.String, nullable=True)
     partners = db.Column(db.String, nullable=True)

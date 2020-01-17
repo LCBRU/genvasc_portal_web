@@ -16,3 +16,5 @@ Flask-WeasyPrint
 flask_mail
 python-dotenv
 sqlalchemy-migrate
+celery
+urllib3

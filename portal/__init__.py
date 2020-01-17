@@ -8,7 +8,8 @@ from .standard_views import init_standard_views
 from .security import init_security, init_users
 from .utils import ReverseProxied
 from .ui import blueprint as ui_blueprint
-
+from .celery import init_celery, celery
+from .etl import init_etl
 
 def create_app(config=BaseConfig):
     app = Flask(__name__)
@@ -23,6 +24,8 @@ def create_app(config=BaseConfig):
         init_template_filters(app)
         init_standard_views(app)
         init_security(app)
+        init_celery(app)
+        init_etl(app)
 
     app.register_blueprint(ui_blueprint)
 

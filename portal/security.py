@@ -91,14 +91,11 @@ def init_security(app):
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     Security(
-        app, user_datastore,
+        app,
+        user_datastore,
         reset_password_form=ResetPasswordForm,
         change_password_form=ChangePasswordForm,
     )
-
-    user_datastore.find_or_create_role(
-        name=Role.ADMIN_ROLENAME,
-        description='Administration')
 
     @app.before_request
     def get_current_user():
@@ -106,6 +103,16 @@ def init_security(app):
 
 
 def init_users():
+    admin_role = Role.query.filter_by(name=Role.ADMIN_ROLENAME).one_or_none()
+
+    if admin_role is None:
+        db.session.add(
+            Role(
+                name=Role.ADMIN_ROLENAME,
+                description=Role.ADMIN_ROLENAME,
+            )
+        )
+
     admin_user = User.query.filter_by(email=current_app.config["ADMIN_EMAIL_ADDRESS"]).one_or_none()
 
     if admin_user is None:
