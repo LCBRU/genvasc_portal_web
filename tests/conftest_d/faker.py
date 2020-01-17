@@ -26,6 +26,14 @@ class FakerProvider(BaseProvider):
             'status': 0,
         }
 
+    def etl_ccg_details(self, id):
+        fake = Faker("en_GB")
+        return {
+            'project_id': 1,
+            'ccg_id': id,
+            'name': fake.company(),
+        }
+
 
 @pytest.yield_fixture(scope="function")
 def faker():

@@ -25,6 +25,14 @@ practice_table = Table(
 )
 
 
+ccg_table = Table(
+    'etl_ccg', meta,
+    Column('project_id', Integer),
+    Column('ccg_id', Integer),
+    Column('name', String(100)),
+)
+
+
 @contextmanager
 def etl_practice_database():
     try:

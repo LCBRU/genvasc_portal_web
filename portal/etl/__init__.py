@@ -2,11 +2,12 @@ from celery.schedules import crontab
 from sqlalchemy.sql import text
 from flask import current_app
 from portal.celery import celery
-from portal.models import Practice
+from portal.models import Practice, Ccg
 from portal.database import db
 from .database import (
     etl_practice_database,
     practice_table,
+    ccg_table,
 )
 
 
@@ -44,3 +45,22 @@ def import_practice():
             )
 
     db.session.add_all(practices)
+
+
+@celery.task
+def import_ccg():
+    current_app.logger.info('Importing ccg details')
+
+    ccgs = []
+
+    with etl_practice_database() as p_db:
+        for p in p_db.execute(ccg_table.select()):
+            ccgs.append(
+                Ccg(
+                    project_id=p['project_id'],
+                    id=p['ccg_id'],
+                    name=p['name'],
+                )
+            )
+
+    db.session.add_all(ccgs)

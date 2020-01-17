@@ -3,6 +3,15 @@ from portal import db
 from flask_security import UserMixin, RoleMixin
 
 
+class Ccg(db.Model):
+
+    __tablename__ = 'etl_ccg'
+
+    project_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+
 class Practice(db.Model):
 
     __tablename__ = 'etl_practice'
