@@ -7,10 +7,19 @@ class Ccg(db.Model):
 
     __tablename__ = 'etl_ccg'
 
-
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, nullable=False)
     ccg_id = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String, nullable=False)
+
+
+class Federation(db.Model):
+
+    __tablename__ = 'etl_federation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, nullable=False)
+    federation_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
 
 

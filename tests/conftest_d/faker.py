@@ -34,6 +34,14 @@ class FakerProvider(BaseProvider):
             'name': fake.company(),
         }
 
+    def etl_federation_details(self, id):
+        fake = Faker("en_GB")
+        return {
+            'project_id': 1,
+            'federation_id': id,
+            'name': fake.company(),
+        }
+
 
 @pytest.yield_fixture(scope="function")
 def faker():

@@ -33,6 +33,14 @@ ccg_table = Table(
 )
 
 
+federation_table = Table(
+    'etl_federation', meta,
+    Column('project_id', Integer),
+    Column('federation_id', Integer),
+    Column('name', String(100)),
+)
+
+
 @contextmanager
 def etl_practice_database():
     try:

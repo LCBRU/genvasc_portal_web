@@ -2,12 +2,13 @@ from celery.schedules import crontab
 from sqlalchemy.sql import text
 from flask import current_app
 from portal.celery import celery
-from portal.models import Practice, Ccg
+from portal.models import Practice, Ccg, Federation
 from portal.database import db
 from .database import (
     etl_practice_database,
     practice_table,
     ccg_table,
+    federation_table,
 )
 
 
@@ -105,3 +106,33 @@ def import_ccg():
     
     updated_ccgs = Ccg.query.with_entities(Ccg.id).filter(Ccg.id.in_([c.id for c in ccgs])).subquery()
     Ccg.query.filter(Ccg.id.notin_(updated_ccgs)).delete(synchronize_session='fetch')
+
+
+@celery.task
+def import_federation():
+    current_app.logger.info('Importing federation details')
+
+    federations = []
+
+    with etl_practice_database() as p_db:
+        for f in p_db.execute(federation_table.select()):
+            federation = Federation.query.filter_by(
+                project_id=f['project_id'],
+                federation_id=f['federation_id'],
+            ).one_or_none()
+
+            if federation is None:
+                federation = Federation(
+                    project_id=f['project_id'],
+                    federation_id=f['federation_id'],
+                )
+            
+            federation.name = f['name']
+
+            federations.append(federation)
+
+    db.session.add_all(federations)
+    db.session.flush()
+    
+    updated_federations = Federation.query.with_entities(Federation.id).filter(Federation.id.in_([f.id for f in federations])).subquery()
+    Federation.query.filter(Federation.id.notin_(updated_federations)).delete(synchronize_session='fetch')
