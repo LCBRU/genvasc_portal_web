@@ -18,16 +18,24 @@ class Practice(db.Model):
 
     __tablename__ = 'etl_practice'
 
-    code = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, index=True)
+    code = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
     ccg_id = db.Column(db.Integer, nullable=True)
-    ccg_name = db.Column(db.String, nullable=True)
-    address = db.Column(db.String, nullable=True)
+    street_address = db.Column(db.String, nullable=True)
+    town = db.Column(db.String, nullable=True)
+    city = db.Column(db.String, nullable=True)
+    county = db.Column(db.String, nullable=True)
+    postcode = db.Column(db.String, nullable=True)
+    federation = db.Column(db.Integer, nullable=True)
     partners = db.Column(db.String, nullable=True)
     delegates = db.relationship(
         "Delegate",
         back_populates="practice",
     )
+    genvasc_initiated = db.Column(db.Boolean, nullable=True)
+    status = db.Column(db.Integer, nullable=True)
 
 
 class Role(db.Model, RoleMixin):

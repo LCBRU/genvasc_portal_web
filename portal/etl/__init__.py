@@ -34,17 +34,47 @@ def import_practice():
 
     with etl_practice_database() as p_db:
         for p in p_db.execute(practice_table.select()):
-            practices.append(
-                Practice(
+            practice = Practice.query.filter_by(
+                code=p['practice_code'],
+            ).one_or_none()
+
+            if practice is None:
+                practice = Practice(
+                    project_id=p['project_id'],
                     code=p['practice_code'],
                     name=p['practice_name'],
                     ccg_id=p['ccg'],
-                    address=p['practice_address'],
+                    street_address=p['practice_address'],
+                    town=p['pract_town'],
+                    city=p['city'],
+                    county=p['county'],
+                    postcode=p['postcode'],
+                    federation=p['federation'],
                     partners=p['partners'],
+                    genvasc_initiated=p['genvasc_initiated'],
+                    status=p['status'],
                 )
-            )
+            
+            practice.project_id = p['project_id']
+            practice.name = p['practice_name']
+            practice.ccg_id = p['ccg']
+            practice.street_address = p['practice_address']
+            practice.town = p['pract_town']
+            practice.city = p['city']
+            practice.county = p['county']
+            practice.postcode = p['postcode']
+            practice.federation = p['federation']
+            practice.partners = p['partners']
+            practice.genvasc_initiated = p['genvasc_initiated']
+            practice.status = p['status']
+
+            practices.append(practice)
 
     db.session.add_all(practices)
+    db.session.flush()
+
+    updated_practices = Practice.query.with_entities(Practice.id).filter(Practice.id.in_([p.id for p in practices])).subquery()
+    Practice.query.filter(Practice.id.notin_(updated_practices)).delete(synchronize_session='fetch')
 
 
 @celery.task
