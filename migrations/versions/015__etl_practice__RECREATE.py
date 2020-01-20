@@ -33,11 +33,10 @@ def upgrade(migrate_engine):
         Column("postcode", NVARCHAR(100), nullable=True),
         Column("genvasc_initiated", Boolean, nullable=False),
         Column("status", Integer, nullable=False),
-        Column("federation", Integer, nullable=False, index=True),
+        Column("federation", Integer, nullable=True, index=True),
         Column("partners", NVARCHAR(500), nullable=True),
     )
     t.create()
-
 
 
 def downgrade(migrate_engine):

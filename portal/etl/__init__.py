@@ -41,19 +41,7 @@ def import_practice():
 
             if practice is None:
                 practice = Practice(
-                    project_id=p['project_id'],
                     code=p['practice_code'],
-                    name=p['practice_name'],
-                    ccg_id=p['ccg'],
-                    street_address=p['practice_address'],
-                    town=p['pract_town'],
-                    city=p['city'],
-                    county=p['county'],
-                    postcode=p['postcode'],
-                    federation=p['federation'],
-                    partners=p['partners'],
-                    genvasc_initiated=p['genvasc_initiated'],
-                    status=p['status'],
                 )
             
             practice.project_id = p['project_id']
@@ -66,7 +54,7 @@ def import_practice():
             practice.postcode = p['postcode']
             practice.federation = p['federation']
             practice.partners = p['partners']
-            practice.genvasc_initiated = p['genvasc_initiated']
+            practice.genvasc_initiated = p['genvasc_initiated'] == 1
             practice.status = p['status']
 
             practices.append(practice)

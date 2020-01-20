@@ -120,23 +120,6 @@ class PracticeRegistration(db.Model):
     practice = db.relationship(Practice)
 
 
-class StaffMember(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    practice_registration_id = db.Column(
-        db.Integer,
-        db.ForeignKey(PracticeRegistration.id))
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    practice_registration = db.relationship(
-        PracticeRegistration,
-        backref=db.backref('staff', cascade="all, delete-orphan"))
-
-    def full_name(self):
-        return '{} {}'.format(self.first_name or '', self.last_name or '')
-
-
 class Recruit(db.Model):
 
     id = db.Column(db.String(50), primary_key=True)
