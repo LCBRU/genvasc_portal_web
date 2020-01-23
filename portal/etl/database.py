@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean
+from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean, Date
 from contextlib import contextmanager
 from flask import current_app
 
@@ -26,7 +26,7 @@ practice_table = Table(
 
 
 ccg_table = Table(
-    'etl_ccg', meta,
+    'etl_portal_ccg', meta,
     Column('project_id', Integer),
     Column('ccg_id', Integer),
     Column('name', String(100)),
@@ -34,10 +34,40 @@ ccg_table = Table(
 
 
 federation_table = Table(
-    'etl_federation', meta,
+    'etl_portal_federation', meta,
     Column('project_id', Integer),
     Column('federation_id', Integer),
     Column('name', String(100)),
+)
+
+
+delegate_table = Table(
+    'etl_portal_delegate', meta,
+    Column('project_id', Integer),
+    Column('practice_code', String(100)),
+    Column('instance', Integer),
+    Column('name', String(500)),
+    Column('role', String(100)),
+    Column('gcp_trained', Boolean),
+    Column('gv_trained', Boolean),
+    Column('on_delegation_log_yn', Boolean),
+    Column('gv_start_del_log', Date),
+    Column('gv_end_del_log', Date),
+    Column('rsn_not_on_del_log', String(500)),
+    Column('gv_phone_a', String(100)),
+    Column('gv_phone_b', String(100)),
+    Column('contact_email_add', String(100)),
+    Column('primary_contact_yn', Boolean),
+)
+
+
+user_table = Table(
+    'etl_portal_user', meta,
+    Column('project_id', Integer),
+    Column('practice_code', String(100)),
+    Column('email', String(250)),
+    Column('current_portal_user_yn', Integer),
+    Column('gv_end_del_log', String(100)),
 )
 
 

@@ -72,19 +72,25 @@ practice_registrations_users = db.Table(
     db.Column(
         'user_id',
         db.Integer(),
-        db.ForeignKey('user.id')),
+        db.ForeignKey('user.id'),
+    ),
     db.Column(
         'practice_registration_id',
         db.Integer(),
-        db.ForeignKey('practice_registration.id')))
+        db.ForeignKey('practice_registration.id'),
+    )
+)
 
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, index=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
+    current_portal_user_yn = db.Column(db.Boolean)
+    gv_end_del_log = db.Column(db.Date)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime())
@@ -95,11 +101,13 @@ class User(db.Model, UserMixin):
     roles = db.relationship(
         'Role',
         secondary=roles_users,
-        backref=db.backref('users', lazy='dynamic'))
+        backref=db.backref('users', lazy='dynamic'),
+    )
     practices = db.relationship(
         'PracticeRegistration',
         secondary=practice_registrations_users,
-        backref=db.backref('users', lazy='dynamic'))
+        backref=db.backref('users', lazy='dynamic'),
+    )
 
     def is_admin(self):
         return self.has_role(Role.ADMIN_ROLENAME)
@@ -186,18 +194,19 @@ class RecruitStatus(db.Model):
 
 class Delegate(db.Model):
 
-    __tablename__ = 'etl_delegationLog'
+    __tablename__ = 'etl_delegate'
 
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer)
     practice_code = db.Column(
         db.String,
         db.ForeignKey(Practice.code),
-        primary_key=True,
     )
     practice = db.relationship(Practice, back_populates="delegates")
-    instance = db.Column(db.Integer, primary_key=True)
+    instance = db.Column(db.Integer)
     name = db.Column(db.String(500))
     role = db.Column(db.String(500))
-    gcp_training = db.Column(db.Boolean)
+    gcp_trained = db.Column(db.Boolean)
     gv_trained = db.Column(db.Boolean)
     on_delegation_log_yn = db.Column(db.Boolean)
     gv_start_del_log = db.Column(db.Date)

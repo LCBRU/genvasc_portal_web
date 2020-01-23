@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from portal.etl.database import practice_table, etl_practice_database
 from portal.etl import import_practice
-from portal.models import Practice
+from portal.models import Practice, PracticeRegistration
 from portal.database import db
 
 @pytest.mark.parametrize(
@@ -101,6 +101,11 @@ def _create_db_practices(practices):
             status=p['status'],
         ) for p in practices]
     )
+    db.session.add_all(
+        [PracticeRegistration(
+            code=p['practice_code'],
+        ) for p in practices]
+    )
     db.session.commit()
 
 
@@ -124,10 +129,17 @@ def _assert_practices_exist(expected):
         assert actual.genvasc_initiated == e['genvasc_initiated']
         assert actual.status == e['status']
 
+        assert PracticeRegistration.query.filter_by(
+            code=e['practice_code'],
+        ).one_or_none() is not None
+
+
 def _assert_practices_do_not_exist(not_expected):
     for ne in not_expected:
-        actual = Practice.query.filter_by(
+        assert Practice.query.filter_by(
             code=ne['practice_code'],
-        ).one_or_none()
+        ).one_or_none() is None
 
-        assert actual is None
+        assert PracticeRegistration.query.filter_by(
+            code=ne['practice_code'],
+        ).one_or_none() is None
