@@ -71,6 +71,13 @@ class FakerProvider(BaseProvider):
             'gv_end_del_log': None,
         }
 
+    def etl_area_details(self, id):
+        fake = Faker("en_GB")
+        return {
+            'project_id': id,
+            'name': fake.company(),
+        }
+
 
 @pytest.yield_fixture(scope="function")
 def faker():

@@ -41,6 +41,13 @@ federation_table = Table(
 )
 
 
+management_area_table = Table(
+    'etl_portal_management_area', meta,
+    Column('project_id', Integer),
+    Column('name', String(100)),
+)
+
+
 delegate_table = Table(
     'etl_portal_delegate', meta,
     Column('project_id', Integer),

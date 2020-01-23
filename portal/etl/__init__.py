@@ -11,6 +11,7 @@ from portal.models import (
     Delegate,
     User,
     PracticeRegistration,
+    ManagementArea,
 )
 from portal.database import db
 from .database import (
@@ -20,6 +21,7 @@ from .database import (
     federation_table,
     delegate_table,
     user_table,
+    management_area_table,
 )
 
 
@@ -56,19 +58,30 @@ def import_practice():
                     code=p['practice_code'],
                 )
             
-            practice.project_id = p['project_id']
             practice.name = p['practice_name']
-            practice.ccg_id = p['ccg']
             practice.street_address = p['practice_address']
             practice.town = p['pract_town']
             practice.city = p['city']
             practice.county = p['county']
             practice.postcode = p['postcode']
-            practice.federation = p['federation']
             practice.partners = p['partners']
             practice.genvasc_initiated = p['genvasc_initiated'] == 1
             practice.status = p['status']
 
+            ccg = Ccg.query.filter_by(
+                identifier=p['ccg'], project_id=p['project_id']
+            ).one_or_none()
+
+            federation = Federation.query.filter_by(
+                identifier=p['federation'], project_id=p['project_id']
+            ).one_or_none()
+
+            management_area = ManagementArea.query.filter_by(
+                project_id=p['project_id']
+            ).one_or_none()
+
+            practice.groups = [g for g in [ccg, federation, management_area] if g]
+            
             practices.append(practice)
 
             practice_registration = PracticeRegistration.query.filter_by(
@@ -150,6 +163,34 @@ def import_federation():
     
     updated_federations = Federation.query.with_entities(Federation.id).filter(Federation.id.in_([f.id for f in federations])).subquery()
     Federation.query.filter(Federation.id.notin_(updated_federations)).delete(synchronize_session='fetch')
+
+
+@celery.task
+def import_areas():
+    current_app.logger.info('Importing management area details')
+
+    areas = []
+
+    with etl_practice_database() as p_db:
+        for a in p_db.execute(management_area_table.select()):
+            area = ManagementArea.query.filter_by(
+                project_id=a['project_id'],
+            ).one_or_none()
+
+            if area is None:
+                area = ManagementArea(
+                    project_id=a['project_id'],
+                )
+            
+            area.name = a['name']
+
+            areas.append(area)
+
+    db.session.add_all(areas)
+    db.session.flush()
+    
+    updated_areas = ManagementArea.query.with_entities(ManagementArea.id).filter(ManagementArea.id.in_([a.id for a in areas])).subquery()
+    ManagementArea.query.filter(ManagementArea.id.notin_(updated_areas)).delete(synchronize_session='fetch')
 
 
 @celery.task

@@ -74,6 +74,7 @@ def _create_etl_ccgs(etl_practice_db, ccgs):
 
 
 def _create_db_ccgs(ccgs):
+    print(ccgs)
     db.session.add_all(
         [Ccg(
             project_id=c['project_id'],

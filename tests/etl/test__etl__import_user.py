@@ -142,4 +142,4 @@ def _assert_user_practices(email, practices):
 
     assert actual is not None
 
-    assert [p['practice_code'] for p in practices] == [p.code for p in actual.practices]
+    assert sorted([p['practice_code'] for p in practices]) == sorted([p.code for p in actual.practices])

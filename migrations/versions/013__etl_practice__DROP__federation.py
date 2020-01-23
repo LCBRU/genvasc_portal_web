@@ -3,6 +3,7 @@ from sqlalchemy import (
     Table,
     Column,
     Integer,
+    NVARCHAR,
 )
 
 
@@ -11,14 +12,14 @@ meta = MetaData()
 
 def upgrade(migrate_engine):
     meta.bind = migrate_engine
-
     t = Table("etl_practice", meta, autoload=True)
-
-    ccg_id = Column("ccg_id", Integer, index=True)
-    ccg_id.create(t, index_name='idx__practice__ccg_id')
+    t.c.federation.drop()
 
 
 def downgrade(migrate_engine):
     meta.bind = migrate_engine
+
     t = Table("etl_practice", meta, autoload=True)
-    t.c.ccg_id.drop()
+
+    ccg_id = Column("federation", NVARCHAR(500), index=True)
+    ccg_id.create(t, index_name='idx__practice__federation')

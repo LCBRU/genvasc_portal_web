@@ -3,14 +3,31 @@ from portal import db
 from flask_security import UserMixin, RoleMixin
 
 
+practice_groups_practices = db.Table(
+    'practice_groups_practices',
+    db.Column(
+        'practice_group_id',
+        db.Integer(),
+        db.ForeignKey('practice_group.id')),
+    db.Column(
+        'practice_id',
+        db.Integer(),
+        db.ForeignKey('etl_practice.id')))
+
+
 class PracticeGroup(db.Model):
 
     __tablename__ = 'practice_group'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
     project_id = db.Column(db.Integer, index=True)
-    identifier = db.Column(db.Integer, nullable=False)
+    identifier = db.Column(db.Integer, nullable=True)
     name = db.Column(db.String, nullable=False)
+    practices = db.relationship(
+        'Practice',
+        secondary=practice_groups_practices,
+        backref=db.backref('groups', lazy='dynamic'),
+    )
 
     __mapper_args__ = {
         "polymorphic_identity": "PracticeGroup",
@@ -32,21 +49,25 @@ class Ccg(PracticeGroup):
     }
 
 
+class ManagementArea(PracticeGroup):
+
+    __mapper_args__ = {
+        "polymorphic_identity": 'Management Area',
+    }
+
+
 class Practice(db.Model):
 
     __tablename__ = 'etl_practice'
 
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, index=True)
     code = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    ccg_id = db.Column(db.Integer, nullable=True)
     street_address = db.Column(db.String, nullable=True)
     town = db.Column(db.String, nullable=True)
     city = db.Column(db.String, nullable=True)
     county = db.Column(db.String, nullable=True)
     postcode = db.Column(db.String, nullable=True)
-    federation = db.Column(db.Integer, nullable=True)
     partners = db.Column(db.String, nullable=True)
     delegates = db.relationship(
         "Delegate",
