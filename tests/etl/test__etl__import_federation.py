@@ -77,7 +77,7 @@ def _create_db_federations(federations):
     db.session.add_all(
         [Federation(
             project_id=c['project_id'],
-            federation_id=c['federation_id'],
+            identifier=c['federation_id'],
             name=c['name'],
         ) for c in federations]
     )
@@ -88,12 +88,12 @@ def _assert_federations_exist(expected):
     for e in expected:
         actual = Federation.query.filter_by(
             project_id=e['project_id'],
-            federation_id=e['federation_id'],
+            identifier=e['federation_id'],
         ).one_or_none()
 
         assert actual is not None
         assert actual.project_id == e['project_id']
-        assert actual.federation_id == e['federation_id']
+        assert actual.identifier == e['federation_id']
         assert actual.name == e['name']
 
 
@@ -101,7 +101,7 @@ def _assert_federations_does_not_exist(not_expected):
     for ne in not_expected:
         actual = Federation.query.filter_by(
             project_id=ne['project_id'],
-            federation_id=ne['federation_id'],
+            identifier=ne['federation_id'],
         ).one_or_none()
 
         assert actual is None

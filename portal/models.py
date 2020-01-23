@@ -3,24 +3,33 @@ from portal import db
 from flask_security import UserMixin, RoleMixin
 
 
-class Ccg(db.Model):
+class PracticeGroup(db.Model):
 
-    __tablename__ = 'etl_ccg'
-
+    __tablename__ = 'practice_group'
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, nullable=False)
-    ccg_id = db.Column(db.Integer, nullable=False)
+    type = db.Column(db.String, nullable=False)
+    project_id = db.Column(db.Integer, index=True)
+    identifier = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
 
+    __mapper_args__ = {
+        "polymorphic_identity": "PracticeGroup",
+        "polymorphic_on": type,
+    }
 
-class Federation(db.Model):
 
-    __tablename__ = 'etl_federation'
+class Federation(PracticeGroup):
 
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, nullable=False)
-    federation_id = db.Column(db.Integer, nullable=False)
-    name = db.Column(db.String, nullable=False)
+    __mapper_args__ = {
+        "polymorphic_identity": 'Federation',
+    }
+
+
+class Ccg(PracticeGroup):
+
+    __mapper_args__ = {
+        "polymorphic_identity": 'CCG',
+    }
 
 
 class Practice(db.Model):

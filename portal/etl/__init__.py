@@ -102,13 +102,13 @@ def import_ccg():
         for c in p_db.execute(ccg_table.select()):
             ccg = Ccg.query.filter_by(
                 project_id=c['project_id'],
-                ccg_id=c['ccg_id'],
+                identifier=c['ccg_id'],
             ).one_or_none()
 
             if ccg is None:
                 ccg = Ccg(
                     project_id=c['project_id'],
-                    ccg_id=c['ccg_id'],
+                    identifier=c['ccg_id'],
                 )
             
             ccg.name = c['name']
@@ -132,13 +132,13 @@ def import_federation():
         for f in p_db.execute(federation_table.select()):
             federation = Federation.query.filter_by(
                 project_id=f['project_id'],
-                federation_id=f['federation_id'],
+                identifier=f['federation_id'],
             ).one_or_none()
 
             if federation is None:
                 federation = Federation(
                     project_id=f['project_id'],
-                    federation_id=f['federation_id'],
+                    identifier=f['federation_id'],
                 )
             
             federation.name = f['name']

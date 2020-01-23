@@ -15,16 +15,18 @@ def upgrade(migrate_engine):
     meta.bind = migrate_engine
 
     t = Table(
-        "etl_ccg",
+        "practice_group",
         meta,
         Column("id", Integer, primary_key=True),
-        Column("project_id", Integer, primary_key=True),
-        Column("ccg_id", Integer, primary_key=True),
+        Column("type", NVARCHAR(255), index=True),
+        Column("project_id", Integer, index=True),
+        Column("identifier", Integer, index=True),
         Column("name", NVARCHAR(255), nullable=False),
         UniqueConstraint(
+            'type',
             'project_id',
-            'ccg_id',
-            name='uix__etl_ccg__project_id__ccg_id'
+            'identifier',
+            name='uix__practice_group__type__project_id__identifier'
         ),
     )
     t.create()
@@ -32,5 +34,5 @@ def upgrade(migrate_engine):
 
 def downgrade(migrate_engine):
     meta.bind = migrate_engine
-    t = Table("etl_ccg", meta, autoload=True)
+    t = Table("practice_group", meta, autoload=True)
     t.drop()

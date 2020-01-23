@@ -77,7 +77,7 @@ def _create_db_ccgs(ccgs):
     db.session.add_all(
         [Ccg(
             project_id=c['project_id'],
-            ccg_id=c['ccg_id'],
+            identifier=c['ccg_id'],
             name=c['name'],
         ) for c in ccgs]
     )
@@ -88,12 +88,12 @@ def _assert_ccgs_exist(expected):
     for e in expected:
         actual = Ccg.query.filter_by(
             project_id=e['project_id'],
-            ccg_id=e['ccg_id'],
+            identifier=e['ccg_id'],
         ).one_or_none()
 
         assert actual is not None
         assert actual.project_id == e['project_id']
-        assert actual.ccg_id == e['ccg_id']
+        assert actual.identifier == e['ccg_id']
         assert actual.name == e['name']
 
 
@@ -101,7 +101,7 @@ def _assert_ccgs_does_not_exist(not_expected):
     for ne in not_expected:
         actual = Ccg.query.filter_by(
             project_id=ne['project_id'],
-            ccg_id=ne['ccg_id'],
+            identifier=ne['ccg_id'],
         ).one_or_none()
 
         assert actual is None
