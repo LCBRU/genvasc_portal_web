@@ -22,7 +22,6 @@ def upgrade(migrate_engine):
         "etl_practice",
         meta,
         Column("id", Integer, nullable=False, primary_key=True),
-        Column("project_id", Integer, nullable=False, index=True),
         Column("code", NVARCHAR(50), nullable=False, index=True),
         Column("name", NVARCHAR(100), nullable=False),
         Column("ccg_id", Integer, nullable=True, index=True),

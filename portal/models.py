@@ -200,7 +200,6 @@ class Delegate(db.Model):
     __tablename__ = 'etl_delegate'
 
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer)
     practice_code = db.Column(
         db.String,
         db.ForeignKey(Practice.code),

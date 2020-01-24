@@ -39,8 +39,19 @@ def setup_import_tasks(sender, **kwargs):
             minute=current_app.config['PRACTICE_ETL_SCHEDULE_MINUTE'],
             hour=current_app.config['PRACTICE_ETL_SCHEDULE_HOUR'],
         ),
-        import_practice.s(),
+        import_all.s(),
     )
+
+
+@celery.task
+def import_all():
+    import_areas()
+    import_federation()
+    import_ccg()
+    import_practice()
+    import_delegate()
+    import_user()
+    import_recruit()
 
 
 @celery.task
@@ -204,14 +215,12 @@ def import_delegate():
     with etl_practice_database() as p_db:
         for f in p_db.execute(delegate_table.select()):
             delegate = Delegate.query.filter_by(
-                project_id=f['project_id'],
                 practice_code=f['practice_code'],
                 instance=f['instance'],
             ).one_or_none()
 
             if delegate is None:
                 delegate = Delegate(
-                    project_id=f['project_id'],
                     practice_code=f['practice_code'],
                     instance=f['instance'],
                 )

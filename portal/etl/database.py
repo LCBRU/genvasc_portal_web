@@ -51,7 +51,6 @@ management_area_table = Table(
 
 delegate_table = Table(
     'etl_portal_delegate', practice_etl_meta,
-    Column('project_id', Integer),
     Column('practice_code', String(100)),
     Column('instance', Integer),
     Column('name', String(500)),

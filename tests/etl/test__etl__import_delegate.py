@@ -67,7 +67,6 @@ def _create_etl_delegates(etl_practice_db, delegates):
     for p in delegates:
         etl_practice_db.execute(
             delegate_table.insert(),
-            project_id=p['project_id'],
             practice_code=p['practice_code'],
             instance=p['instance'],
             name=p['name'],
@@ -87,7 +86,6 @@ def _create_etl_delegates(etl_practice_db, delegates):
 def _create_db_delegates(delegates):
     db.session.add_all(
         [Delegate(
-            project_id=p['project_id'],
             practice_code=p['practice_code'],
             instance=p['instance'],
             name=p['name'],
@@ -109,14 +107,12 @@ def _create_db_delegates(delegates):
 def _assert_delegates_exist(expected):
     for e in expected:
         actual = Delegate.query.filter_by(
-            project_id=e['project_id'],
             practice_code=e['practice_code'],
             instance=e['instance'],
         ).one_or_none()
 
         assert actual is not None
 
-        assert actual.project_id == e['project_id']
         assert actual.practice_code == e['practice_code']
         assert actual.instance == e['instance']
         assert actual.name == e['name']
@@ -134,7 +130,6 @@ def _assert_delegates_exist(expected):
 def _assert_delegates_do_not_exist(not_expected):
     for ne in not_expected:
         actual = Delegate.query.filter_by(
-            project_id=ne['project_id'],
             practice_code=ne['practice_code'],
             instance=ne['instance'],
         ).one_or_none()
