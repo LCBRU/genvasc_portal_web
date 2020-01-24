@@ -4,11 +4,12 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean, Date
 from contextlib import contextmanager
 from flask import current_app
 
-meta = MetaData()
+practice_etl_meta = MetaData()
+recruit_etl_meta = MetaData()
 
 
 practice_table = Table(
-    'etl_portal_practice', meta,
+    'etl_portal_practice', practice_etl_meta,
     Column('project_id', Integer),
     Column('practice_code', String(10)),
     Column('practice_name', String(100)),
@@ -26,7 +27,7 @@ practice_table = Table(
 
 
 ccg_table = Table(
-    'etl_portal_ccg', meta,
+    'etl_portal_ccg', practice_etl_meta,
     Column('project_id', Integer),
     Column('ccg_id', Integer),
     Column('name', String(100)),
@@ -34,7 +35,7 @@ ccg_table = Table(
 
 
 federation_table = Table(
-    'etl_portal_federation', meta,
+    'etl_portal_federation', practice_etl_meta,
     Column('project_id', Integer),
     Column('federation_id', Integer),
     Column('name', String(100)),
@@ -42,14 +43,14 @@ federation_table = Table(
 
 
 management_area_table = Table(
-    'etl_portal_management_area', meta,
+    'etl_portal_management_area', practice_etl_meta,
     Column('project_id', Integer),
     Column('name', String(100)),
 )
 
 
 delegate_table = Table(
-    'etl_portal_delegate', meta,
+    'etl_portal_delegate', practice_etl_meta,
     Column('project_id', Integer),
     Column('practice_code', String(100)),
     Column('instance', Integer),
@@ -69,12 +70,32 @@ delegate_table = Table(
 
 
 user_table = Table(
-    'etl_portal_user', meta,
+    'etl_portal_user', practice_etl_meta,
     Column('project_id', Integer),
     Column('practice_code', String(100)),
     Column('email', String(250)),
     Column('current_portal_user_yn', Integer),
     Column('gv_end_del_log', String(100)),
+)
+
+
+recruit_table = Table(
+    'etl_portal_recruits', recruit_etl_meta,
+    Column('processing_id', String(100)),
+    Column('status', String(100)),
+    Column('nhs_number', String(100)),
+    Column('study_id', String(100)),
+    Column('practice_code', String(100)),
+    Column('first_name', String(100)),
+    Column('last_name', String(100)),
+    Column('date_of_birth', Date),
+    Column('civicrm_contact_id', Integer),
+    Column('civicrm_case_id', Integer),
+    Column('processed_date', Date),
+    Column('recruited_date', Date),
+    Column('invoice_year', Integer),
+    Column('invoice_quarter', String(10)),
+    Column('reimbursed_status', String(10)),
 )
 
 
@@ -86,8 +107,23 @@ def etl_practice_database():
             current_app.config['PRACTICE_DATABASE_URI'],
             echo=current_app.config['SQLALCHEMY_ECHO'],
         )
-        meta.bind = engine
+        practice_etl_meta.bind = engine
         yield engine
     finally:
         engine.dispose()
         current_app.logger.info(f'Disposing practice database engine')
+
+
+@contextmanager
+def etl_recruit_database():
+    try:
+        current_app.logger.info(f'Starting recruit database engine')
+        engine = create_engine(
+            current_app.config['RECRUIT_DATABASE_URI'],
+            echo=current_app.config['SQLALCHEMY_ECHO'],
+        )
+        recruit_etl_meta.bind = engine
+        yield engine
+    finally:
+        engine.dispose()
+        current_app.logger.info(f'Disposing recruit database engine')

@@ -14,6 +14,7 @@ from tests.etl.test__etl__import_ccg import _create_db_ccgs
 from tests.etl.test__etl__import_federation import _create_db_federations
 from tests.etl.test__etl__import_management_area import _create_db_areas
 
+
 @pytest.mark.parametrize(
     "practice_count",
     [0, 1, 2, 3],

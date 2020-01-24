@@ -6,7 +6,6 @@ from sqlalchemy import func
 from .. import blueprint
 from portal.database import db
 from portal.models import (
-    RecruitStatus,
     Recruit,
     PracticeRegistration,
 )
@@ -18,24 +17,24 @@ from portal.models import (
 @roles_required('admin')
 def submissions_index(page=1):
     q = db.session.query(
-        RecruitStatus.invoice_year,
-        RecruitStatus.invoice_quarter,
+        Recruit.invoice_year,
+        Recruit.invoice_quarter,
         func.count().label('participants')
     ).join(
-        RecruitStatus.recruit
+        Recruit.recruit
     ).filter(
-        RecruitStatus.invoice_year != ''
+        Recruit.invoice_year != ''
     ).filter(
-        RecruitStatus.invoice_quarter != ''
+        Recruit.invoice_quarter != ''
     ).group_by(
-        RecruitStatus.invoice_year,
-        RecruitStatus.invoice_quarter
+        Recruit.invoice_year,
+        Recruit.invoice_quarter
     )
 
     submissions = (
         q.order_by(
-            RecruitStatus.invoice_year,
-            RecruitStatus.invoice_quarter
+            Recruit.invoice_year,
+            Recruit.invoice_quarter
         ).paginate(
             page=page,
             per_page=10,
@@ -50,14 +49,14 @@ def submissions_index(page=1):
 @roles_required('admin')
 def submissions_participants(invoice_year, invoice_quarter, page=1):
 
-    q = RecruitStatus.query.join(
-        Recruit, RecruitStatus.recruit
+    q = Recruit.query.join(
+        Recruit, Recruit.recruit
     ).join(
         PracticeRegistration, Recruit.practice_registration
     ).filter(
-        RecruitStatus.invoice_year == invoice_year
+        Recruit.invoice_year == invoice_year
     ).filter(
-        RecruitStatus.invoice_quarter == invoice_quarter
+        Recruit.invoice_quarter == invoice_quarter
     )
 
     participants = (
@@ -104,16 +103,16 @@ def submissions_csv(invoice_year, invoice_quarter):
 
     output.writeheader()
     
-    q = RecruitStatus.query.join(
-        Recruit, RecruitStatus.recruit
+    q = Recruit.query.join(
+        Recruit, Recruit.recruit
     ).join(
         PracticeRegistration, Recruit.practice_registration
     ).filter(
-        RecruitStatus.invoice_year == invoice_year
+        Recruit.invoice_year == invoice_year
     ).filter(
-        RecruitStatus.invoice_quarter == invoice_quarter
+        Recruit.invoice_quarter == invoice_quarter
     ).filter(
-        RecruitStatus.status != 'Excluded'
+        Recruit.status != 'Excluded'
     )
 
     participants = q.order_by(

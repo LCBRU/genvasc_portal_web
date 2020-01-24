@@ -9,7 +9,12 @@ from bs4 import BeautifulSoup
 from portal import create_app
 from portal.database import db
 from portal.config import TestConfig, TestConfigCRSF
-from portal.etl.database import meta, etl_practice_database
+from portal.etl.database import (
+    practice_etl_meta,
+    etl_practice_database,
+    etl_recruit_database,
+    recruit_etl_meta,
+)
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -94,6 +99,13 @@ def client_with_crsf(faker):
 
 @pytest.yield_fixture(scope="function")
 def etl_practice_db(app):
-    with etl_practice_database() as p_db:
-        meta.create_all()
-        yield p_db
+    with etl_practice_database() as db:
+        practice_etl_meta.create_all()
+        yield db
+
+
+@pytest.yield_fixture(scope="function")
+def etl_recruit_db(app):
+    with etl_recruit_database() as db:
+        recruit_etl_meta.create_all()
+        yield db

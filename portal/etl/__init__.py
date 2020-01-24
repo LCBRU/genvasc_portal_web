@@ -12,16 +12,19 @@ from portal.models import (
     User,
     PracticeRegistration,
     ManagementArea,
+    Recruit,
 )
 from portal.database import db
 from .database import (
     etl_practice_database,
+    etl_recruit_database,
     practice_table,
     ccg_table,
     federation_table,
     delegate_table,
     user_table,
     management_area_table,
+    recruit_table,
 )
 
 
@@ -94,7 +97,6 @@ def import_practice():
                         code=p['practice_code'],
                     )
                 )
-
 
     db.session.add_all(practices)
     db.session.add_all(practice_registrations)
@@ -266,3 +268,51 @@ def import_user():
     
     updated = User.query.with_entities(User.id).filter(User.id.in_([u.id for u in users])).subquery()
     User.query.filter(User.id.notin_(updated)).delete(synchronize_session='fetch')
+
+
+@celery.task
+def import_recruit():
+    current_app.logger.info('Importing recruit details')
+
+    recruits = []
+
+    with etl_recruit_database() as r_db:
+        for r in r_db.execute(recruit_table.select()):
+            p = Practice.query.filter_by(code=r['practice_code']).one_or_none()
+
+            if r['processing_id'] is not None:
+                recruit = Recruit.query.filter_by(
+                    processing_id=r['processing_id'],
+                ).one_or_none()
+            else:
+                recruit = Recruit.query.filter_by(
+                    study_id=r['study_id'],
+                ).one_or_none()
+
+            if recruit is None:
+                recruit = Recruit(
+                    processing_id=r['processing_id'],
+                )
+            
+            recruit.status = r['status']
+            recruit.nhs_number = r['nhs_number']
+            recruit.study_id = r['study_id']
+            recruit.practice_id = p.id
+            recruit.first_name = r['first_name']
+            recruit.last_name = r['last_name']
+            recruit.date_of_birth = r['date_of_birth']
+            recruit.civicrm_contact_id = r['civicrm_contact_id']
+            recruit.civicrm_case_id = r['civicrm_case_id']
+            recruit.processed_date = r['processed_date']
+            recruit.date_recruited = r['recruited_date']
+            recruit.invoice_year = r['invoice_year']
+            recruit.invoice_quarter = r['invoice_quarter']
+            recruit.reimbursed_status = r['reimbursed_status']
+
+            recruits.append(recruit)
+
+    db.session.add_all(recruits)
+    db.session.flush()
+    
+    updated = Recruit.query.with_entities(Recruit.id).filter(Recruit.id.in_([r.id for r in recruits])).subquery()
+    Recruit.query.filter(Recruit.id.notin_(updated)).delete(synchronize_session='fetch')

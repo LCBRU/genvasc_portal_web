@@ -160,55 +160,28 @@ class PracticeRegistration(db.Model):
 
 class Recruit(db.Model):
 
-    id = db.Column(db.String(50), primary_key=True)
-    practice_registration_id = db.Column(
+    id = db.Column(db.Integer, primary_key=True)
+    practice_id = db.Column(
         db.Integer,
-        db.ForeignKey(PracticeRegistration.id))
-    practice_registration = db.relationship(
-        PracticeRegistration,
-        backref=db.backref('recruits', cascade="all, delete-orphan"))
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    user = db.relationship(
-        User,
-        backref=db.backref('recruits', cascade="all, delete-orphan"))
+        db.ForeignKey(Practice.id),
+    )
+    practice = db.relationship(
+        Practice,
+        backref=db.backref('recruits', cascade="all, delete-orphan"),
+    )
+    processing_id = db.Column(db.String(100))
     nhs_number = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
-    date_recruited = db.Column(db.Date, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.relationship(
-        "RecruitStatus",
-        uselist=False,
-        back_populates="recruit",
-    )
-
-    @property
-    def date_of_birth_day(self):
-        return self.date_of_birth.day
-
-    @property
-    def date_of_birth_month(self):
-        return self.date_of_birth.month
-
-    @property
-    def date_of_birth_year(self):
-        return self.date_of_birth.year
-
-
-class RecruitStatus(db.Model):
-
-    __tablename__ = 'etl_recruit_status'
-
-    id = db.Column(db.String(50), db.ForeignKey(Recruit.id), primary_key=True)
-    recruit = db.relationship(Recruit, uselist=False, back_populates="status")
+    date_recruited = db.Column(db.Date)
     status = db.Column(db.String(100))
     study_id = db.Column(db.String(100))
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
-    processed_by = db.Column(db.String(500))
     processed_date = db.Column(db.Date)
     invoice_year = db.Column(db.String(50))
     invoice_quarter = db.Column(db.String(50))
     reimbursed_status = db.Column(db.String(50))
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     @property
     def full_name(self):

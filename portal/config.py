@@ -46,6 +46,7 @@ class BaseConfig(object):
 
     # Databases
     PRACTICE_DATABASE_URI=os.environ["PRACTICE_DATABASE_URI"]
+    RECRUIT_DATABASE_URI=os.environ["RECRUIT_DATABASE_URI"]
 
 
 class TestConfig(BaseConfig):
@@ -54,6 +55,7 @@ class TestConfig(BaseConfig):
     TESTING = True
     SQLALCHEMY_DATABASE_URI="sqlite://"
     PRACTICE_DATABASE_URI="sqlite://"
+    RECRUIT_DATABASE_URI="sqlite://"
     WTF_CSRF_ENABLED = False
     SMTP_SERVER = None
     SQLALCHEMY_ECHO = False

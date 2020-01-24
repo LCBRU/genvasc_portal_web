@@ -2,7 +2,7 @@ from flask import render_template, request
 from flask_security import login_required
 from .. import blueprint
 from portal.database import db
-from portal.models import Recruit, RecruitStatus, PracticeRegistration
+from portal.models import Recruit, PracticeRegistration
 from ..forms import SearchForm
 from portal.helpers import must_exist
 from sqlalchemy import or_, func
@@ -20,8 +20,8 @@ def recruits_index(code):
     q = Recruit.query.join(PracticeRegistration, Recruit.practice_registration).filter(PracticeRegistration.code == code)
 
     if searchForm.search.data:
-        string_in_name = db.session.query(RecruitStatus.id).filter(func.concat(RecruitStatus.first_name, ' ', RecruitStatus.last_name).ilike("%{}%".format(searchForm.search.data)))
-        string_in_study_id = db.session.query(RecruitStatus.id).filter(RecruitStatus.study_id.ilike("%{}%".format(searchForm.search.data)))
+        string_in_name = db.session.query(Recruit.id).filter(func.concat(Recruit.first_name, ' ', Recruit.last_name).ilike("%{}%".format(searchForm.search.data)))
+        string_in_study_id = db.session.query(Recruit.id).filter(Recruit.study_id.ilike("%{}%".format(searchForm.search.data)))
         q = q.filter(or_(
             Recruit.nhs_number.like("%{}%".format(searchForm.search.data)),
             Recruit.id.in_(string_in_name),

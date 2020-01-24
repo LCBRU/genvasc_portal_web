@@ -4,7 +4,6 @@ from flask_security import login_required
 from .. import blueprint
 from portal.database import db
 from portal.models import (
-    RecruitStatus,
     PracticeRegistration,
     Recruit,
 )
@@ -20,28 +19,28 @@ def reimbursements_index(code, page=1):
     practice_registration = PracticeRegistration.query.filter(PracticeRegistration.code == code).first()
 
     q = db.session.query(
-        RecruitStatus.invoice_year,
-        RecruitStatus.invoice_quarter,
+        Recruit.invoice_year,
+        Recruit.invoice_quarter,
         func.count().label('participants')
     ).join(
-        RecruitStatus.recruit
+        Recruit.recruit
     ).join(
         Recruit.practice_registration
     ).filter(
         PracticeRegistration.code == code
     ).filter(
-        RecruitStatus.invoice_year != ''
+        Recruit.invoice_year != ''
     ).filter(
-        RecruitStatus.invoice_quarter != ''
+        Recruit.invoice_quarter != ''
     ).group_by(
-        RecruitStatus.invoice_year,
-        RecruitStatus.invoice_quarter
+        Recruit.invoice_year,
+        Recruit.invoice_quarter
     )
 
     reimbursements = (
         q.order_by(
-            RecruitStatus.invoice_year,
-            RecruitStatus.invoice_quarter
+            Recruit.invoice_year,
+            Recruit.invoice_quarter
         ).paginate(
             page=page,
             per_page=10,
@@ -57,16 +56,16 @@ def reimbursements_index(code, page=1):
 def reimbursements_participants(code, invoice_year, invoice_quarter, page=1):
     practice_registration = PracticeRegistration.query.filter(PracticeRegistration.code == code).first()
 
-    q = RecruitStatus.query.join(
-        Recruit, RecruitStatus.recruit
+    q = Recruit.query.join(
+        Recruit, Recruit.recruit
     ).join(
         PracticeRegistration, Recruit.practice_registration
     ).filter(
         PracticeRegistration.code == code
     ).filter(
-        RecruitStatus.invoice_year == invoice_year
+        Recruit.invoice_year == invoice_year
     ).filter(
-        RecruitStatus.invoice_quarter == invoice_quarter
+        Recruit.invoice_quarter == invoice_quarter
     )
 
     participants = (
@@ -85,16 +84,16 @@ def reimbursements_participants(code, invoice_year, invoice_quarter, page=1):
 def reimbursements_pdf(code, invoice_year, invoice_quarter):
     practice_registration = PracticeRegistration.query.filter(PracticeRegistration.code == code).first()
 
-    q = RecruitStatus.query.join(
-        Recruit, RecruitStatus.recruit
+    q = Recruit.query.join(
+        Recruit, Recruit.recruit
     ).join(
         PracticeRegistration, Recruit.practice_registration
     ).filter(
         PracticeRegistration.code == code
     ).filter(
-        RecruitStatus.invoice_year == invoice_year
+        Recruit.invoice_year == invoice_year
     ).filter(
-        RecruitStatus.invoice_quarter == invoice_quarter
+        Recruit.invoice_quarter == invoice_quarter
     )
 
     participants = q.order_by(Recruit.date_recruited.asc()).all()
