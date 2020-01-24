@@ -1,4 +1,7 @@
+import re
 import traceback
+from datetime import datetime, date
+from dateutil.parser import parse
 from portal.emailing import email
 from flask import current_app
 
@@ -50,3 +53,27 @@ def log_exception(e):
         message=traceback.format_exc(),
         recipients=current_app.config["ADMIN_EMAIL_ADDRESS"].split(";"),
     )
+
+
+def parse_date(value):
+    if not value:
+        return None
+
+    if isinstance(value, date) or isinstance(value, datetime):
+        return value
+
+    ansi_match = re.fullmatch(r'(?P<year>\d{4})[\\ -]?(?P<month>\d{2})[\\ -]?(?P<day>\d{2})(?:[ T]\d{2}:\d{2}:\d{2})?(?:\.\d+)?(?:[+-]\d{2}:\d{2})?', value)
+
+    if ansi_match:
+        return datetime(
+            int(ansi_match.group('year')),
+            int(ansi_match.group('month')),
+            int(ansi_match.group('day')),
+        )
+
+    try:
+        parsed_date = parse(value, dayfirst=True)
+    except ValueError:
+        return None
+
+    return parsed_date

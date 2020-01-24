@@ -5,7 +5,7 @@ from portal.etl import import_recruit
 from portal.models import Recruit, Practice
 from portal.database import db
 from tests.etl.test__etl__import_practice import _create_db_practices
-
+from pprint import pprint as pp
 
 @pytest.mark.parametrize(
     "recruit_count",
@@ -198,7 +198,7 @@ def _assert_recruits_exist(expected):
             ).one_or_none()
         else:
             actual = Recruit.query.filter_by(
-                study_id=e['study_id'],
+                civicrm_case_id=e['civicrm_case_id'],
             ).one_or_none()
 
         assert actual is not None
@@ -225,7 +225,7 @@ def _assert_recruits_does_not_exist(not_expected):
             ).one_or_none()
         else:
             actual = Recruit.query.filter_by(
-                study_id=ne['study_id'],
+                civicrm_case_id=ne['civicrm_case_id'],
             ).one_or_none()
 
         assert actual is None

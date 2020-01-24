@@ -1,3 +1,5 @@
+import random
+import string
 from celery.schedules import crontab
 from sqlalchemy.sql import text
 from flask import current_app
@@ -15,6 +17,7 @@ from portal.models import (
     Recruit,
 )
 from portal.database import db
+from portal.utils import parse_date
 from .database import (
     etl_practice_database,
     etl_recruit_database,
@@ -117,6 +120,8 @@ def import_practice():
     PracticeRegistration.query.filter(PracticeRegistration.code.notin_(updated_practices)).delete(synchronize_session='fetch')
     Practice.query.filter(Practice.code.notin_(updated_practices)).delete(synchronize_session='fetch')
 
+    db.session.commit()
+
 
 @celery.task
 def import_ccg():
@@ -146,6 +151,8 @@ def import_ccg():
     
     updated_ccgs = Ccg.query.with_entities(Ccg.id).filter(Ccg.id.in_([c.id for c in ccgs])).subquery()
     Ccg.query.filter(Ccg.id.notin_(updated_ccgs)).delete(synchronize_session='fetch')
+
+    db.session.commit()
 
 
 @celery.task
@@ -177,6 +184,8 @@ def import_federation():
     updated_federations = Federation.query.with_entities(Federation.id).filter(Federation.id.in_([f.id for f in federations])).subquery()
     Federation.query.filter(Federation.id.notin_(updated_federations)).delete(synchronize_session='fetch')
 
+    db.session.commit()
+
 
 @celery.task
 def import_areas():
@@ -205,6 +214,8 @@ def import_areas():
     updated_areas = ManagementArea.query.with_entities(ManagementArea.id).filter(ManagementArea.id.in_([a.id for a in areas])).subquery()
     ManagementArea.query.filter(ManagementArea.id.notin_(updated_areas)).delete(synchronize_session='fetch')
 
+    db.session.commit()
+
 
 @celery.task
 def import_delegate():
@@ -216,13 +227,13 @@ def import_delegate():
         for f in p_db.execute(delegate_table.select()):
             delegate = Delegate.query.filter_by(
                 practice_code=f['practice_code'],
-                instance=f['instance'],
+                instance=int(f['instance']),
             ).one_or_none()
 
             if delegate is None:
                 delegate = Delegate(
                     practice_code=f['practice_code'],
-                    instance=f['instance'],
+                    instance=int(f['instance']),
                 )
             
             delegate.name = f['name']
@@ -230,8 +241,8 @@ def import_delegate():
             delegate.gcp_trained = f['gcp_trained']
             delegate.gv_trained = f['gv_trained']
             delegate.on_delegation_log_yn = f['on_delegation_log_yn']
-            delegate.gv_start_del_log = f['gv_start_del_log']
-            delegate.gv_end_del_log = f['gv_end_del_log']
+            delegate.gv_start_del_log = parse_date(f['gv_start_del_log'])
+            delegate.gv_end_del_log = parse_date(f['gv_end_del_log'])
             delegate.gv_phone_a = f['gv_phone_a']
             delegate.gv_phone_b = f['gv_phone_b']
             delegate.contact_email_add = f['contact_email_add']
@@ -245,6 +256,8 @@ def import_delegate():
     updated_delegates = Delegate.query.with_entities(Delegate.id).filter(Delegate.id.in_([f.id for f in delegates])).subquery()
     Delegate.query.filter(Delegate.id.notin_(updated_delegates)).delete(synchronize_session='fetch')
 
+    db.session.commit()
+
 
 @celery.task
 def import_user():
@@ -253,18 +266,20 @@ def import_user():
     users = []
 
     with etl_practice_database() as p_db:
-        for email, details in groupby(p_db.execute(user_table.select().order_by(user_table.c.email)), key=lambda x: x['email']):
+        for email, details in groupby(p_db.execute(user_table.select().order_by(user_table.c.email)), key=lambda x: x['email'].lower()):
             user = User.query.filter_by(email=email).one_or_none()
 
             if user is None:
                 user = User(email=email)
+                user.password = ''.join(random.choice(string.ascii_lowercase) for _ in range(20))
             
             ds = list(details)
 
             u = ds[0]
             user.project_id = u['project_id']
-            user.current_portal_user_yn = u['current_portal_user_yn']
-            user.gv_end_del_log = u['gv_end_del_log']
+            user.current_portal_user_yn = bool(u['current_portal_user_yn'])
+            user.gv_end_del_log = parse_date(u['gv_end_del_log'])
+
 
             user.practices = PracticeRegistration.query.filter(
                 PracticeRegistration.code.in_([d['practice_code'] for d in ds])
@@ -278,6 +293,8 @@ def import_user():
     updated = User.query.with_entities(User.id).filter(User.id.in_([u.id for u in users])).subquery()
     User.query.filter(User.id.notin_(updated)).delete(synchronize_session='fetch')
 
+    db.session.commit()
+
 
 @celery.task
 def import_recruit():
@@ -289,24 +306,28 @@ def import_recruit():
         for r in r_db.execute(recruit_table.select()):
             p = Practice.query.filter_by(code=r['practice_code']).one_or_none()
 
+            if p is None:
+                current_app.logger.info(f'Practice not found "{r["practice_code"]}"')
+                continue
+
             if r['processing_id'] is not None:
                 recruit = Recruit.query.filter_by(
                     processing_id=r['processing_id'],
                 ).one_or_none()
             else:
                 recruit = Recruit.query.filter_by(
-                    study_id=r['study_id'],
+                    civicrm_case_id=r['civicrm_case_id'],
                 ).one_or_none()
 
             if recruit is None:
                 recruit = Recruit(
                     processing_id=r['processing_id'],
                 )
-            
+
+            recruit.practice_id = p.id
             recruit.status = r['status']
             recruit.nhs_number = r['nhs_number']
             recruit.study_id = r['study_id']
-            recruit.practice_id = p.id
             recruit.first_name = r['first_name']
             recruit.last_name = r['last_name']
             recruit.date_of_birth = r['date_of_birth']
@@ -325,3 +346,5 @@ def import_recruit():
     
     updated = Recruit.query.with_entities(Recruit.id).filter(Recruit.id.in_([r.id for r in recruits])).subquery()
     Recruit.query.filter(Recruit.id.notin_(updated)).delete(synchronize_session='fetch')
+
+    db.session.commit()

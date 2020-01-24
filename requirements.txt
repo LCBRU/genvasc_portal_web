@@ -18,3 +18,4 @@ python-dotenv
 sqlalchemy-migrate
 celery
 urllib3
+python-dateutil

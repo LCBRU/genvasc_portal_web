@@ -7,6 +7,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Date,
+    UniqueConstraint,
 )
 
 
@@ -24,9 +25,8 @@ def upgrade(migrate_engine):
         "etl_delegate",
         meta,
         Column("id", Integer, primary_key=True),
-        Column("project_id", Integer, index=True, nullable=False),
         Column("practice_code", NVARCHAR(100), index=True, nullable=False),
-        Column("instance", Integer, nullable=False, primary_key=True),
+        Column("instance", Integer, nullable=False, index=True),
         Column("name", NVARCHAR(500), nullable=False),
         Column("role", NVARCHAR(500), nullable=True),
         Column("gcp_trained", Boolean, nullable=True),
@@ -39,6 +39,11 @@ def upgrade(migrate_engine):
         Column("gv_phone_b", NVARCHAR(100), nullable=True),
         Column("contact_email_add", NVARCHAR(500), nullable=True),
         Column("primary_contact_yn", Boolean, nullable=True),
+        UniqueConstraint(
+            'practice_code',
+            'instance',
+            name='uix__etl_delegate__practice_code__instance'
+        ),
     )
     t.create()
 

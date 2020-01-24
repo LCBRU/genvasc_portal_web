@@ -122,7 +122,7 @@ class FakerProvider(BaseProvider):
             'civicrm_case_id': fake.pyint(min_value=1000, max_value=9999, step=1),
             'processed_date': fake.date_between(start_date='-2w', end_date='-1d'),
             'recruited_date': fake.date_between(start_date='-2w', end_date='-1d'),
-            'invoice_year': fake.year(),
+            'invoice_year': int(fake.year()),
             'invoice_quarter': f'Q{fake.pyint(min_value=1, max_value=4, step=1)}',
             'reimbursed_status': 'Yes',
         }

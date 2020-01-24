@@ -1,7 +1,7 @@
 CREATE VIEW etl_portal_recruits AS
 
 SELECT DISTINCT
-      gr.id AS genvasc_port_recruits_id
+      gr.id AS processing_id
     , 'Awaiting processing' AS status
     , gr.nhs_number COLLATE utf8_unicode_ci AS nhs_number
     , NULL AS study_id
@@ -9,11 +9,11 @@ SELECT DISTINCT
     , NULL AS first_name
     , NULL AS last_name
     , gr.dob AS date_of_birth
-    , gr.contact_id
-    , gr.case_id
+    , gr.contact_id AS civicrm_contact_id
+    , gr.case_id AS civicrm_case_id
     , NULL AS processed_by
     , NULL AS processed_date
-    , gr.date_recruited
+    , gr.date_recruited AS recruited_date
     , NULL AS invoice_year
     , NULL AS invoice_quarter
     , NULL AS reimbursed_status
@@ -26,7 +26,7 @@ WHERE gr.case_id IS NULL
 UNION
 
 SELECT DISTINCT
-       NULL AS id
+       NULL AS processing_id
      , cs.name AS status
      , cids.nhs_number_1 AS nhs_number
      , gen.genvasc_id_10 AS study_id
@@ -34,11 +34,11 @@ SELECT DISTINCT
      , con.first_name AS first_name
      , con.last_name AS last_name
      , con.birth_date AS date_of_birth
-     , con.id AS contact_id
-     , cas.id AS case_id
+     , con.id AS civicrm_contact_id
+     , cas.id AS civicrm_case_id
      , rel_c.display_name AS processed_by
      , COALESCE(rel_r.start_date, cas.start_date) AS processed_date
-     , cas.start_date AS date_recruited
+     , cas.start_date AS recruited_date
      , inv.invoice_year_107 AS invoice_year
      , inv.invoice_quarter_108 AS invoice_quarter
      , inv.reimbursed_status_114 AS reimbursed_status
