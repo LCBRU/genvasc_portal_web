@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean, Date
+from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean, Date, DateTime
 from contextlib import contextmanager
 from flask import current_app
 
@@ -23,6 +23,7 @@ practice_table = Table(
     Column('partners', String(100)),
     Column('genvasc_initiated', Integer),
     Column('status', Integer),
+    Column('last_update_timestamp', DateTime),
 )
 
 
@@ -65,6 +66,7 @@ delegate_table = Table(
     Column('gv_phone_b', String(100)),
     Column('contact_email_add', String(100)),
     Column('primary_contact_yn', Boolean),
+    Column('last_update_timestamp', DateTime),
 )
 
 
@@ -75,6 +77,7 @@ user_table = Table(
     Column('email', String(250)),
     Column('current_portal_user_yn', Integer),
     Column('gv_end_del_log', String(100)),
+    Column('last_update_timestamp', DateTime),
 )
 
 
@@ -95,6 +98,7 @@ recruit_table = Table(
     Column('invoice_year', Integer),
     Column('invoice_quarter', String(10)),
     Column('reimbursed_status', String(10)),
+    Column('last_update_timestamp', DateTime),
 )
 
 

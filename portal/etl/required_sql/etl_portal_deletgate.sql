@@ -1,19 +1,20 @@
 CREATE VIEW etl_portal_delegate AS
 SELECT
-    record AS practice_code,
-    instance,
-    COALESCE(name, '') name,
+    contacts.record AS practice_code,
+    contacts.instance,
+    COALESCE(contacts.name, '') name,
     COALESCE(roles.role_name, gv_role_other) AS role,
-    gcp_trained,
-    gv_trained,
-    on_delegation_log_yn,
-    gv_start_del_log,
-    gv_end_del_log,
-    rsn_not_on_del_log,
-    gv_phone_a,
-    gv_phone_b,
-    contact_email_add,
-    primary_contact_yn
+    contacts.gcp_trained,
+    contacts.gv_trained,
+    contacts.on_delegation_log_yn,
+    contacts.gv_start_del_log,
+    contacts.gv_end_del_log,
+    contacts.rsn_not_on_del_log,
+    contacts.gv_phone_a,
+    contacts.gv_phone_b,
+    contacts.contact_email_add,
+    contacts.primary_contact_yn,
+    ts.last_update_timestamp
 FROM (
     SELECT
         record,
@@ -92,4 +93,19 @@ LEFT JOIN (
           field_name, n
     ) x
 ) roles ON roles.role_value = contacts.role AND roles.project_id = contacts.project_id
+LEFT JOIN (
+	SELECT
+		pk as record,
+		project_id,
+		MAX(COALESCE(ts, 0)) AS last_update_timestamp
+	FROM redcap_log_event
+	WHERE event NOT IN ('DATA_EXPORT', 'DELETE')
+	    # Ignore events caused by the data import from
+	    # the mobile app
+	    AND page NOT IN ('DataImportController:index')
+	    AND project_id IN (29, 53)
+	  	AND object_type = 'redcap_data'
+	GROUP BY pk, project_id
+ ) ts ON ts.record = contacts.record
+ 	AND ts.project_id = contacts.project_id
 ;

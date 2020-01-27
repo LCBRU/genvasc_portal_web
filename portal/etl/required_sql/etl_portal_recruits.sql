@@ -1,3 +1,160 @@
+CREATE TABLE IF NOT EXISTS lbrc_recruitment_audit (
+    case_id INT NOT NULL  PRIMARY KEY,
+    last_change_timestamp TIMESTAMP NOT NULL
+);
+
+DELIMITER $$
+
+CREATE TRIGGER trg_civicrm_case_insert
+    AFTER INSERT
+    ON civicrm_case FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (NEW.id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+
+CREATE TRIGGER trg_civicrm_case_update
+    AFTER UPDATE
+    ON civicrm_case FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (NEW.id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_case_delete
+    AFTER DELETE
+    ON civicrm_case FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (OLD.id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+
+CREATE TRIGGER trg_civicrm_value_genvasc_invoice_data_25_insert
+    AFTER INSERT
+    ON civicrm_value_genvasc_invoice_data_25 FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (NEW.entity_id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_value_genvasc_invoice_data_25_update
+    AFTER UPDATE
+    ON civicrm_value_genvasc_invoice_data_25 FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (NEW.entity_id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_value_genvasc_invoice_data_25_delete
+    AFTER DELETE
+    ON civicrm_value_genvasc_invoice_data_25 FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (OLD.entity_id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_value_genvasc_recruitment_data_5_insert
+    AFTER INSERT
+    ON civicrm_value_genvasc_recruitment_data_5 FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (NEW.entity_id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_value_genvasc_recruitment_data_5_update
+    AFTER UPDATE
+    ON civicrm_value_genvasc_recruitment_data_5 FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (NEW.entity_id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_value_genvasc_recruitment_data_5_delete
+    AFTER DELETE
+    ON civicrm_value_genvasc_recruitment_data_5 FOR EACH ROW
+    BEGIN
+	    
+	   INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+	   VALUES (OLD.entity_id, CURRENT_TIMESTAMP)
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_contact_insert
+    AFTER INSERT
+    ON civicrm_contact FOR EACH ROW
+    BEGIN
+	    
+		INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+		SELECT ccc.case_id , CURRENT_TIMESTAMP
+		FROM civicrm_case_contact ccc
+		JOIN civicrm_case cas
+			ON cas.id = ccc.case_id
+		WHERE cas.case_type_id = 3
+			AND ccc.contact_id = NEW.id
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+
+CREATE TRIGGER trg_civicrm_contact_update
+    AFTER UPDATE
+    ON civicrm_contact FOR EACH ROW
+    BEGIN
+	    
+		INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+		SELECT ccc.case_id , CURRENT_TIMESTAMP
+		FROM civicrm_case_contact ccc
+		JOIN civicrm_case cas
+			ON cas.id = ccc.case_id
+		WHERE cas.case_type_id = 3
+			AND ccc.contact_id = NEW.id
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+	
+CREATE TRIGGER trg_civicrm_contact_delete
+    AFTER DELETE
+    ON civicrm_contact FOR EACH ROW
+    BEGIN
+	    
+		INSERT INTO lbrc_recruitment_audit (case_id, last_change_timestamp)
+		SELECT ccc.case_id , CURRENT_TIMESTAMP
+		FROM civicrm_case_contact ccc
+		JOIN civicrm_case cas
+			ON cas.id = ccc.case_id
+		WHERE cas.case_type_id = 3
+			AND ccc.contact_id = OLD.id
+	   ON DUPLICATE KEY UPDATE last_change_timestamp=CURRENT_TIMESTAMP;
+	    
+	END$$
+
+DELIMITER ;
+
 CREATE VIEW etl_portal_recruits AS
 
 SELECT DISTINCT
@@ -17,6 +174,7 @@ SELECT DISTINCT
     , NULL AS invoice_year
     , NULL AS invoice_quarter
     , NULL AS reimbursed_status
+    ,  CURRENT_TIMESTAMP AS last_update_timestamp
 FROM drupallive_docker4716.genvasc_portal_recruits gr
 JOIN civicrm_value_gp_surgery_data_3 gpCustom ON gpCustom.entity_id = gr.practice_id
 WHERE gr.case_id IS NULL
@@ -42,6 +200,7 @@ SELECT DISTINCT
      , inv.invoice_year_107 AS invoice_year
      , inv.invoice_quarter_108 AS invoice_quarter
      , inv.reimbursed_status_114 AS reimbursed_status
+     , au.last_change_timestamp AS last_update_timestamp
   FROM civicrm_case cas
   LEFT JOIN civicrm_option_value cs ON cs.value = cas.status_id
         AND cs.option_group_id = 27 -- CASE_STATUS_GROUP_ID
@@ -62,6 +221,8 @@ SELECT DISTINCT
         AND ( rel_r.start_date IS NULL OR rel_r.start_date <= CURDATE())
   LEFT JOIN civicrm_contact rel_c ON rel_c.id = rel_r.contact_id_b
   LEFT JOIN civicrm_value_genvasc_invoice_data_25 inv ON inv.entity_id = cas.id
+  LEFT JOIN lbrc_recruitment_audit au
+  	ON au.case_id = cas.id
   WHERE cas.case_type_id = 3 -- GENVASC_CASE_TYPE
       AND LENGTH(TRIM(COALESCE(cids.nhs_number_1, ''))) > 0
       AND con.birth_date IS NOT NULL

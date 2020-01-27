@@ -1,10 +1,11 @@
 CREATE VIEW etl_portal_user AS
 SELECT
-	project_id,
-	practice_code,
-	email,
-	MAX(current_portal_user_yn) AS current_portal_user_yn,
-	MAX(gv_end_del_log) AS gv_end_del_log
+	x.project_id,
+	x.practice_code,
+	x.email,
+	MAX(x.current_portal_user_yn) AS current_portal_user_yn,
+	MAX(x.gv_end_del_log) AS gv_end_del_log,
+	ts.last_update_timestamp
 FROM (
 
 	SELECT DISTINCT
@@ -51,7 +52,22 @@ FROM (
 	WHERE e.project_id IN (29, 53)
 		AND e.field_name = 'contact_email_add'
 ) x
-GROUP BY project_id,
-	practice_code,
-	email
+LEFT JOIN (
+	SELECT
+		pk as record,
+		project_id,
+		MAX(COALESCE(ts, 0)) AS last_update_timestamp
+	FROM redcap_log_event
+	WHERE event NOT IN ('DATA_EXPORT', 'DELETE')
+	    # Ignore events caused by the data import from
+	    # the mobile app
+	    AND page NOT IN ('DataImportController:index')
+	    AND project_id IN (29, 53)
+	  	AND object_type = 'redcap_data'
+	GROUP BY pk, project_id
+ ) ts ON ts.record = x.practice_code
+ 	AND ts.project_id = x.project_id
+GROUP BY x.project_id,
+	x.practice_code,
+	x.email
 ;
