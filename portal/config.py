@@ -47,6 +47,7 @@ class BaseConfig(object):
     # Databases
     PRACTICE_DATABASE_URI=os.environ["PRACTICE_DATABASE_URI"]
     RECRUIT_DATABASE_URI=os.environ["RECRUIT_DATABASE_URI"]
+    IMPORT_DATABASE_URI=os.environ["IMPORT_DATABASE_URI"]
 
 
 class TestConfig(BaseConfig):

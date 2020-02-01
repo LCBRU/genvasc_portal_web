@@ -12,7 +12,6 @@ from portal.config import TestConfig, TestConfigCRSF
 from portal.etl.database import (
     practice_etl_meta,
     etl_practice_database,
-    etl_recruit_database,
     recruit_etl_meta,
 )
 
@@ -101,11 +100,4 @@ def client_with_crsf(faker):
 def etl_practice_db(app):
     with etl_practice_database() as db:
         practice_etl_meta.create_all()
-        yield db
-
-
-@pytest.yield_fixture(scope="function")
-def etl_recruit_db(app):
-    with etl_recruit_database() as db:
-        recruit_etl_meta.create_all()
         yield db

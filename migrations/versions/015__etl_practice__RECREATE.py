@@ -5,6 +5,7 @@ from sqlalchemy import (
     Integer,
     NVARCHAR,
     Boolean,
+    DateTime,
 )
 
 
@@ -34,6 +35,7 @@ def upgrade(migrate_engine):
         Column("status", Integer, nullable=False),
         Column("federation", Integer, nullable=True, index=True),
         Column("partners", NVARCHAR(500), nullable=True),
+        Column("last_update_timestamp", DateTime, nullable=False, index=True),
     )
     t.create()
 

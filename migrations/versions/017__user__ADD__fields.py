@@ -1,3 +1,4 @@
+import datetime
 from sqlalchemy import (
     MetaData,
     Table,
@@ -5,6 +6,8 @@ from sqlalchemy import (
     Integer,
     Date,
     Boolean,
+    DateTime,
+    BigInteger,
 )
 
 
@@ -22,6 +25,10 @@ def upgrade(migrate_engine):
     current_portal_user_yn.create(t)
     gv_end_del_log = Column("gv_end_del_log", Date)
     gv_end_del_log.create(t)
+    last_update_timestamp = Column("last_update_timestamp", BigInteger, nullable=True, index=True)
+    last_update_timestamp.create(t, index_name="idx__user__last_update_timestamp")
+    is_imported = Column("is_imported", Boolean)
+    is_imported.create(t)
 
 
 def downgrade(migrate_engine):
@@ -30,3 +37,5 @@ def downgrade(migrate_engine):
     t.c.project_id.drop()
     t.c.current_portal_user_yn.drop()
     t.c.gv_end_del_log.drop()
+    t.c.last_update_timestamp.drop()
+    t.c.is_imported.drop()

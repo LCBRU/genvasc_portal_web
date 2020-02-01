@@ -42,6 +42,7 @@ def upgrade(migrate_engine):
         Column("invoice_quarter", NVARCHAR(50), nullable=True),
         Column("reimbursed_status", NVARCHAR(50), nullable=True),
         Column("date_created", DateTime, nullable=True),
+        Column("last_update_timestamp", DateTime, nullable=False, index=True),
 
     )
     t.create()

@@ -22,7 +22,7 @@ def upgrade(migrate_engine):
     meta.bind = migrate_engine
 
     t = Table(
-        "etl_delegate",
+        "etl_delegationLog",
         meta,
         Column("id", Integer, primary_key=True),
         Column("practice_code", NVARCHAR(100), index=True, nullable=False),
@@ -39,6 +39,7 @@ def upgrade(migrate_engine):
         Column("gv_phone_b", NVARCHAR(100), nullable=True),
         Column("contact_email_add", NVARCHAR(500), nullable=True),
         Column("primary_contact_yn", Boolean, nullable=True),
+        Column("last_update_timestamp", DateTime, nullable=False, index=True),
         UniqueConstraint(
             'practice_code',
             'instance',
@@ -52,7 +53,7 @@ def downgrade(migrate_engine):
     meta = MetaData()
     meta.bind = migrate_engine
 
-    t = Table("etl_delegate", meta, autoload=True)
+    t = Table("etl_delegationLog", meta, autoload=True)
     t.drop(migrate_engine)
 
     meta = MetaData()

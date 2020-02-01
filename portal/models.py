@@ -3,31 +3,12 @@ from portal import db
 from flask_security import UserMixin, RoleMixin
 
 
-practice_groups_practices = db.Table(
-    'practice_groups_practices',
-    db.Column(
-        'practice_group_id',
-        db.Integer(),
-        db.ForeignKey('practice_group.id')),
-    db.Column(
-        'practice_id',
-        db.Integer(),
-        db.ForeignKey('etl_practice.id')))
-
-
 class PracticeGroup(db.Model):
 
     __tablename__ = 'practice_group'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
-    project_id = db.Column(db.Integer, index=True)
-    identifier = db.Column(db.Integer, nullable=True)
     name = db.Column(db.String, nullable=False)
-    practices = db.relationship(
-        'Practice',
-        secondary=practice_groups_practices,
-        backref=db.backref('groups', lazy='dynamic'),
-    )
 
     __mapper_args__ = {
         "polymorphic_identity": "PracticeGroup",
@@ -58,10 +39,12 @@ class ManagementArea(PracticeGroup):
 
 class Practice(db.Model):
 
-    __tablename__ = 'etl_practice'
+    __tablename__ = 'etl_practice_detail'
 
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String, nullable=False)
+    project_id = db.Column(db.Integer, nullable=False)
+    ccg = db.Column(db.Integer, nullable=True)
+    federation = db.Column(db.Integer, nullable=True)
+    code = db.Column(db.String, nullable=False, primary_key=True)
     name = db.Column(db.String, nullable=False)
     street_address = db.Column(db.String, nullable=True)
     town = db.Column(db.String, nullable=True)
@@ -69,12 +52,16 @@ class Practice(db.Model):
     county = db.Column(db.String, nullable=True)
     postcode = db.Column(db.String, nullable=True)
     partners = db.Column(db.String, nullable=True)
-    delegates = db.relationship(
-        "Delegate",
-        back_populates="practice",
-    )
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
     status = db.Column(db.Integer, nullable=True)
+
+
+class PracticeGroupPractice(db.Model):
+
+    __tablename__ = 'etl_practice_groups_practices'
+
+    practice_group_id = db.Column(db.Integer, primary_key=True)
+    practice_code = db.Column(db.String, nullable=False, primary_key=True)
 
 
 class Role(db.Model, RoleMixin):
@@ -97,17 +84,17 @@ roles_users = db.Table(
         db.ForeignKey('role.id')))
 
 
-practice_registrations_users = db.Table(
-    'practice_registrations_users',
+practices_users = db.Table(
+    'practices_users',
     db.Column(
         'user_id',
         db.Integer(),
         db.ForeignKey('user.id'),
     ),
     db.Column(
-        'practice_registration_id',
+        'practice_code',
         db.Integer(),
-        db.ForeignKey('practice_registration.id'),
+        db.ForeignKey('etl_practice_detail.code'),
     )
 )
 
@@ -128,16 +115,18 @@ class User(db.Model, UserMixin):
     last_login_ip = db.Column(db.String(50))
     current_login_ip = db.Column(db.String(50))
     login_count = db.Column(db.Integer())
+    is_imported = db.Column(db.Boolean(), default=False)
     roles = db.relationship(
         'Role',
         secondary=roles_users,
         backref=db.backref('users', lazy='dynamic'),
     )
     practices = db.relationship(
-        'PracticeRegistration',
-        secondary=practice_registrations_users,
+        'Practice',
+        secondary=practices_users,
         backref=db.backref('users', lazy='dynamic'),
     )
+    last_update_timestamp = db.Column(db.Integer, nullable=True)
 
     def is_admin(self):
         return self.has_role(Role.ADMIN_ROLENAME)
@@ -159,32 +148,22 @@ class PracticeRegistration(db.Model):
 
 
 class Recruit(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    practice_id = db.Column(
-        db.Integer,
-        db.ForeignKey(Practice.id),
-    )
-    practice = db.relationship(
-        Practice,
-        backref=db.backref('recruits', cascade="all, delete-orphan"),
-    )
-    processing_id = db.Column(db.String(100))
+    __tablename__ = 'etl_recruit'
 
     status = db.Column(db.String(100))
     nhs_number = db.Column(db.String(20), nullable=False)
     study_id = db.Column(db.String(100))
+    practice_code = db.Column(db.String(100), nullable=True)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     date_of_birth = db.Column(db.Date, nullable=False)
     civicrm_contact_id = db.Column(db.Integer)
-    civicrm_case_id = db.Column(db.Integer)
+    civicrm_case_id = db.Column(db.Integer, primary_key=True)
     processed_date = db.Column(db.Date)
-    date_recruited = db.Column(db.Date)
+    date_recruited = db.Column(db.Date, nullable=False)
     invoice_year = db.Column(db.Integer)
     invoice_quarter = db.Column(db.String(50))
     reimbursed_status = db.Column(db.String(50))
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     @property
     def full_name(self):
@@ -202,13 +181,8 @@ class Delegate(db.Model):
 
     __tablename__ = 'etl_delegate'
 
-    id = db.Column(db.Integer, primary_key=True)
-    practice_code = db.Column(
-        db.String,
-        db.ForeignKey(Practice.code),
-    )
-    practice = db.relationship(Practice, back_populates="delegates")
-    instance = db.Column(db.Integer)
+    practice_code = db.Column(db.String, primary_key=True)
+    instance = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500))
     role = db.Column(db.String(500))
     gcp_trained = db.Column(db.Boolean)
@@ -219,5 +193,4 @@ class Delegate(db.Model):
     gv_phone_a = db.Column(db.String(100))
     gv_phone_b = db.Column(db.String(100))
     contact_email_add = db.Column(db.String(500))
-    user = db.relationship('User', foreign_keys=[contact_email_add], primaryjoin='User.email == Delegate.contact_email_add')
     primary_contact_yn = db.Column(db.Boolean)

@@ -6,16 +6,17 @@ from flask import current_app
 
 practice_etl_meta = MetaData()
 recruit_etl_meta = MetaData()
+import_meta = MetaData()
 
 
 practice_table = Table(
-    'etl_portal_practice', practice_etl_meta,
+    'etl_practice_detail', import_meta,
     Column('project_id', Integer),
-    Column('practice_code', String(10)),
-    Column('practice_name', String(100)),
+    Column('code', String(10)),
+    Column('name', String(100)),
     Column('ccg', Integer),
-    Column('practice_address', String(500)),
-    Column('pract_town', String(100)),
+    Column('street_address', String(500)),
+    Column('town', String(100)),
     Column('city', String(100)),
     Column('county', String(100)),
     Column('postcode', String(20)),
@@ -23,35 +24,26 @@ practice_table = Table(
     Column('partners', String(100)),
     Column('genvasc_initiated', Integer),
     Column('status', Integer),
-    Column('last_update_timestamp', DateTime),
 )
 
 
-ccg_table = Table(
-    'etl_portal_ccg', practice_etl_meta,
-    Column('project_id', Integer),
-    Column('ccg_id', Integer),
-    Column('name', String(100)),
+practice_group_table = Table(
+    'etl_practice_group', import_meta,
+    Column('id', Integer),
+    Column('type', Integer),
+    Column('name', String(255)),
 )
 
 
-federation_table = Table(
-    'etl_portal_federation', practice_etl_meta,
-    Column('project_id', Integer),
-    Column('federation_id', Integer),
-    Column('name', String(100)),
-)
-
-
-management_area_table = Table(
-    'etl_portal_management_area', practice_etl_meta,
-    Column('project_id', Integer),
-    Column('name', String(100)),
+practice_groups_practices_table = Table(
+    'etl_practice_groups_practices', import_meta,
+    Column('practice_group_id', Integer),
+    Column('practice_code', String(255)),
 )
 
 
 delegate_table = Table(
-    'etl_portal_delegate', practice_etl_meta,
+    'etl_delegate', import_meta,
     Column('practice_code', String(100)),
     Column('instance', Integer),
     Column('name', String(500)),
@@ -66,7 +58,6 @@ delegate_table = Table(
     Column('gv_phone_b', String(100)),
     Column('contact_email_add', String(100)),
     Column('primary_contact_yn', Boolean),
-    Column('last_update_timestamp', DateTime),
 )
 
 
@@ -82,8 +73,7 @@ user_table = Table(
 
 
 recruit_table = Table(
-    'etl_portal_recruits', recruit_etl_meta,
-    Column('processing_id', String(100)),
+    'etl_recruit', recruit_etl_meta,
     Column('status', String(100)),
     Column('nhs_number', String(100)),
     Column('study_id', String(100)),
@@ -93,12 +83,12 @@ recruit_table = Table(
     Column('date_of_birth', Date),
     Column('civicrm_contact_id', Integer),
     Column('civicrm_case_id', Integer),
+    Column('processed_by', String(100)),
     Column('processed_date', Date),
     Column('recruited_date', Date),
     Column('invoice_year', Integer),
     Column('invoice_quarter', String(10)),
     Column('reimbursed_status', String(10)),
-    Column('last_update_timestamp', DateTime),
 )
 
 
@@ -118,15 +108,15 @@ def etl_practice_database():
 
 
 @contextmanager
-def etl_recruit_database():
+def etl_import_database():
+    current_app.logger.info(f'Starting import database engine')
     try:
-        current_app.logger.info(f'Starting recruit database engine')
         engine = create_engine(
-            current_app.config['RECRUIT_DATABASE_URI'],
+            current_app.config['IMPORT_DATABASE_URI'],
             echo=current_app.config['SQLALCHEMY_ECHO'],
         )
-        recruit_etl_meta.bind = engine
+        import_meta.bind = engine
         yield engine
     finally:
         engine.dispose()
-        current_app.logger.info(f'Disposing recruit database engine')
+        current_app.logger.info(f'Disposing import database engine')
