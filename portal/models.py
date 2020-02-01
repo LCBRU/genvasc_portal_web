@@ -153,7 +153,8 @@ class Recruit(db.Model):
     status = db.Column(db.String(100))
     nhs_number = db.Column(db.String(20), nullable=False)
     study_id = db.Column(db.String(100))
-    practice_code = db.Column(db.String(100), nullable=True)
+    practice_code = db.Column(db.String(100), db.ForeignKey(Practice.code), nullable=True)
+    practice = db.relationship(Practice)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     date_of_birth = db.Column(db.Date, nullable=False)
@@ -174,7 +175,7 @@ class Recruit(db.Model):
         return '{} {}'.format(
             self.invoice_year or '',
             self.invoice_quarter or '',
-        )
+        ).strip()
 
 
 class Delegate(db.Model):

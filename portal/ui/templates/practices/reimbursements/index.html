@@ -21,14 +21,14 @@
 				<td>{{ r.invoice_quarter }}</td>
 				<td>{{ r.participants }}</td>
 				<td>
-					<a href="{{ url_for('reimbursements_participants', code=practice_registration.code, invoice_year=r.invoice_year, invoice_quarter=r.invoice_quarter) }}">Details</a>
-					<a href="{{ url_for('reimbursements_pdf', code=practice_registration.code, invoice_year=r.invoice_year, invoice_quarter=r.invoice_quarter) }}" target="_blank">PDF</a>
+					<a href="{{ url_for('ui.reimbursements_participants', code=practice.code, invoice_year=r.invoice_year, invoice_quarter=r.invoice_quarter) }}">Details</a>
+					<a href="{{ url_for('ui.reimbursements_pdf', code=practice.code, invoice_year=r.invoice_year, invoice_quarter=r.invoice_quarter) }}" target="_blank">PDF</a>
 				</td>
 			</tr>
 		{% endfor %}
 	</tbody>
 </table>
 
-{{ formhelper.render_pagination(reimbursements, 'reimbursements_index', code=practice_registration.code) }}
+{{ formhelper.render_pagination(reimbursements, 'ui.reimbursements_index', code=practice.code) }}
 
 {% endblock %}

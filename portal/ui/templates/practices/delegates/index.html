@@ -5,60 +5,76 @@
 {% block practice_content %}
 
 <div class="page-header">
-  {{ formhelper.render_search(searchForm, 'delegates_index',{'PDF': 'delegates_pdf'} , code=practice_registration.code) }}
+  {{ formhelper.render_search(searchForm, 'ui.delegates_index', buttons={'PDF': 'ui.delegates_pdf'} , code=practice.code) }}
 </div>
 
 <ul class="list-group">
   {% for d in delegates.items %}
     <li class="list-group-item">
-      <h4>{{ d.name }}</h4>
-        <dl>
-          <div>
-            <dt>Role</dt>
-            <dd>{{ d.role | blank_if_none}}</dd>
-          </div>
-          <div>
-            <dt>1&deg; Contact</dt>
-            <dd>{{ d.primary_contact_yn | yes_no }}</dd>
-          </div>
-          <div>
-            <dt>Email</dt>
-            <dd>{{ d.contact_email_add | blank_if_none}}</dd>
-          </div>
-          <div>
-            <dt>Phone</dt>
-            <dd>{{ d.gv_phone_a | blank_if_none}}</dd>
-            <dd>{{ d.gv_phone_b | blank_if_none}}</dd>
-          </div>
-          <div>
-            <dt>GCP Trained</dt>
-            <dd>{{ d.gcp_trained | yes_no }}</dd>
-          </div>
-          <div>
-            <dt>GENVASC Trained</dt>
-            <dd>{{ d.gv_trained | yes_no }}</dd>
-          </div>
-          <div>
-            <dt>On Delegation Log</dt>
-            <dd>{{ d.on_delegation_log_yn | yes_no }}</dd>
-          </div>
-          <div>
+      <header>
+        <h1>
+          <span>{{ d.name }}</span>
+
+          {% if d.primary_contact_yn %}
+            <span class="badge badge-primary">1&deg; Contact</span>
+          {% endif %}
+
+          {% if d.gcp_trained %}
+            <span class="float-right badge badge-success">GCP Trained</span>
+          {% else %}
+            <span class="float-right badge badge-danger">Not GCP Trained</span>
+          {% endif %}
+
+          {% if d.gv_trained %}
+            <span class="float-right badge badge-success">GENVASC Trained</span>
+          {% else %}
+            <span class="float-right badge badge-danger">Not GENVASC Trained</span>
+          {% endif %}
+
+          {% if d.on_delegation_log_yn %}
+            <span class="float-right badge badge-success">On Delegation Log</span>
+          {% else %}
+            <span class="float-right badge badge-danger">Not On Delegation Log</span>
+          {% endif %}
+
+        </h1>
+        <h2>{{ d.role | blank_if_none }}</h2>
+      </header>
+
+      <dl>
+        <div class="row">
+
+          <div class="col-sm-3 col-lg-2">
             <dt>Start Date</dt>
             <dd>{{ d.gv_start_del_log | date_format }}</dd>
           </div>
-          <div>
+
+          <div class="col-sm-3 col-lg-2">
             <dt>End Date</dt>
             <dd>{{ d.gv_end_del_log | date_format }}</dd>
           </div>
-          <div>
-            <dt>Last Login</dt>
-            <dd>{{ d.user.last_login_at | date_format }}</dd>
+
+        </div>
+        <div class="row">
+
+          <div class="col-sm-6">
+            <dt>Email</dt>
+            <dd><a href="mailto:{{ d.contact_email_add | blank_if_none }}">{{ d.contact_email_add | blank_if_none }}</a></dd>
           </div>
-        </dl>
+
+          <div class="col-sm-6">
+            <dt>Phone</dt>
+            <dd>{{ d.gv_phone_a | blank_if_none }}</dd>
+            <dd>{{ d.gv_phone_b | blank_if_none }}</dd>
+          </div>
+        </div>
+
+    </dl>
+
     </li>
   {% endfor %}
   </ul>
 
-{{ formhelper.render_pagination(delegates, 'delegates_index', search=searchForm.search.data, code=practice_registration.code) }}
+{{ formhelper.render_pagination(delegates, 'ui.delegates_index', search=searchForm.search.data, code=practice.code) }}
 
 {% endblock %}

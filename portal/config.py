@@ -8,6 +8,7 @@ load_dotenv()
 
 class BaseConfig(object):
     MAIL_SERVER = os.environ['MAIL_SERVER']
+    MAIL_DEBUG =  os.environ['MAIL_DEBUG']
     SECURITY_EMAIL_SENDER = os.environ['LCBRUIT_EMAIL_ADDRESS']
 
     SECRET_KEY = os.environ['GGPP_FLASK_SECRET_KEY']

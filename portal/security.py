@@ -116,13 +116,14 @@ def init_users():
     admin_user = User.query.filter_by(email=current_app.config["ADMIN_EMAIL_ADDRESS"]).one_or_none()
 
     if admin_user is None:
-        db.session.add(
-            User(
-                email=current_app.config["ADMIN_EMAIL_ADDRESS"],
-                password=current_app.config["ADMIN_PASSWORD"],
-                first_name=current_app.config["ADMIN_FIRST_NAME"],
-                last_name=current_app.config["ADMIN_LAST_NAME"],
-                active=True,
-            )
+        u = User(
+            email=current_app.config["ADMIN_EMAIL_ADDRESS"],
+            password=current_app.config["ADMIN_PASSWORD"],
+            first_name=current_app.config["ADMIN_FIRST_NAME"],
+            last_name=current_app.config["ADMIN_LAST_NAME"],
+            active=True,
         )
+        db.session.add(u)
+        u.roles.append(Role.query.filter_by(name=Role.ADMIN_ROLENAME).one_or_none())
+
         db.session.commit()

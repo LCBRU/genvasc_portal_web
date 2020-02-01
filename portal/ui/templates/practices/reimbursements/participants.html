@@ -19,7 +19,7 @@
 		{% for p in participants.items %}
 			<tr>
 				<td>{{ p.full_name }}</td>
-				<td>{{ p.recruit.nhs_number }}</td>
+				<td>{{ p.nhs_number }}</td>
 				<td>{{ p.study_id }}</td>
 				<td>{{ p.status }}</td>
 				<td>{{ p.reimbursed_status }}</td>
@@ -28,6 +28,6 @@
 	</tbody>
 </table>
 
-{{ formhelper.render_pagination(participants, 'reimbursements_participants', code=practice_registration.code, invoice_year=invoice_year, invoice_quarter=invoice_quarter) }}
+{{ formhelper.render_pagination(participants, 'ui.reimbursements_participants', code=practice.code, invoice_year=invoice_year, invoice_quarter=invoice_quarter) }}
 
 {% endblock %}

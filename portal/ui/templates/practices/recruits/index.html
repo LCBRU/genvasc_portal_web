@@ -5,57 +5,62 @@
 {% block practice_content %}
 
 <div class="page-header">
-  {{ formhelper.render_search(searchForm, 'recruits_index',{} , code=practice_registration.code) }}
+  {{ formhelper.render_search(searchForm, 'ui.recruits_index', code=practice.code) }}
 </div>
 
 <ul class="list-group">
   {% for r in recruits.items %}
     <li class="list-group-item">
-      <h4>{{ r.status.full_name }}</h4>
+
+      <header>
+        <h1>
+          <span>{{ r.full_name }}</span>
+
+          {% if r.invoice_period | length > 0 %}
+            <span class="float-right badge badge-info">Invoice: {{ r.invoice_period }}</span>
+          {% endif %}
+
+          {% if r.status == "Recruited" %}
+            {% set status_class="badge-success" %}
+          {% elif r.status == "Available for cohort" %}
+            {% set status_class="badge-success" %}
+          {% elif r.status == "Excluded" %}
+            {% set status_class="badge-danger" %}
+          {% elif r.status == "Withdrawn" %}
+            {% set status_class="badge-warning" %}
+          {% else %}
+            {% set status_class="badge-secondary" %}
+          {% endif %}
+          
+          <span class="float-right badge {{ status_class }}">{{ r.status }}</span>
+        </h1>
+        <h2>Recruited on {{ r.date_recruited | date_format }} and processed on {{ r.processed_date | date_format }}</h2>
+      </header>
+
       <dl>
-        <div>
+        <div class="row">
+
+          <div class="col-sm-3 col-lg-2">
+            <dt>Study ID</dt>
+            <dd>{{ r.study_id | blank_if_none }}</dd>
+          </div>
+
+          <div class="col-sm-3 col-lg-2">
             <dt>NHS Number</dt>
             <dd>{{ r.nhs_number }}</dd>
-        </div>
-        <div>
+          </div>
+
+          <div class="col-sm-3 col-lg-2">
             <dt>Date of Birth</dt>
             <dd>{{ r.date_of_birth | date_format }}</dd>
-        </div>
-        <div>
-            <dt>Recruited</dt>
-            <dd>{{ r.date_recruited | date_format }}</dd>
-        </div>
-        {% if not r.user.is_system %}
-          <div>
-            <dt>Recruited By</dt>
-            <dd>{{ r.user.full_name }}</dd>
           </div>
-        {% endif %}
-        <div>
-          <dt>Status</dt>
-          <dd>{{ r.status.status | default_if_none('Created') }}</dd>
-        </div>
-        <div>
-          <dt>Study ID</dt>
-          <dd>{{ r.status.study_id | blank_if_none }}</dd>
-        </div>
-        <div>
-          <dt>Processed</dt>
-          <dd>{{ r.status.processed_date | date_format }}</dd>
-        </div>
-        <div>
-          <dt>Invoice</dt>
-          <dd>{{ r.status.invoice_period | default_if_none('Not Invoiced') }}</dd>
-        </div>
-        <div>
-          <dt>Submitted for Reimbursement</dt>
-          <dd>{{ r.status.reimbursed_status | blank_if_none }}</dd>
+
         </div>
       </dl>
     </li>
   {% endfor %}
   </ul>
 
-{{ formhelper.render_pagination(recruits, 'recruits_index', search=searchForm.search.data, code=practice_registration.code) }}
+{{ formhelper.render_pagination(recruits, 'ui.recruits_index', search=searchForm.search.data, code=practice.code) }}
 
 {% endblock %}

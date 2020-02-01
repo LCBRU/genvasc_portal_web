@@ -231,28 +231,6 @@ dd {
   font-size: 20px;
 }
 
-.upload_details {
-  padding: 10px;
-}
-
-.upload_details header {
-  padding-bottom: 20px;
-}
-
-.upload_details h1 {
-  font-size: 20px;
-  color: #23527c;
-  font-weight: bold;
-  margin: 0;
-}
-
-.upload_details h2 {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-  
-}
-
 .login-form {
   position: absolute;
   top: 50%;
@@ -288,6 +266,36 @@ a.fas, a.fas:link, a.fas:hover {
   color: inherit;
   text-decoration: inherit;
   cursor: pointer;
+}
+
+.list-group {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.list-group-item {
+  padding: 10px;
+}
+
+.list-group-item header {
+  padding-bottom: 20px;
+}
+
+.list-group-item h1 {
+  font-size: 20px;
+  color: #23527c;
+  font-weight: bold;
+  margin: 0;
+}
+
+.list-group-item h2 {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.list-group-item .badge {
+  margin-left: 10px;
 }
 
 /** SPINNER CREATION **/

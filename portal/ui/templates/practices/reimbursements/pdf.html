@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>{{ practice_registration.practice.name }} submission for {{ invoice_year }} {{ invoice_quarter }}</title>
+  <title>{{ practice.name }} submission for {{ invoice_year }} {{ invoice_quarter }}</title>
 
   <style>
   	@page {
@@ -73,7 +73,7 @@
 
 <body>
 
-	<h1>{{ practice_registration.practice.name }}</h1>
+	<h1>{{ practice.name }}</h1>
 	<h2>GENVASC Reimbursement Report for {{ invoice_quarter }} {{ invoice_year }}</h2>
 
 	<table class="totals">
@@ -107,7 +107,7 @@
 		<tbody>
 			{% for p in participants %}
 				<tr>
-					<td>{{ p.recruit.date_recruited | date_format }}</td>
+					<td>{{ p.date_recruited | date_format }}</td>
 					<td>{{ p.status }}</td>
 					<td>{{ p.full_name }}</td>
 					<td>{{ p.study_id }}</td>
