@@ -25,15 +25,16 @@
 						<td>{{ s.invoice_quarter }}</td>
 						<td>{{ s.participants }}</td>
 						<td>
-							<a href="{{ url_for('submissions_participants', invoice_year=s.invoice_year, invoice_quarter=s.invoice_quarter) }}">Details</a>
-							<a href="{{ url_for('submissions_csv', invoice_year=s.invoice_year, invoice_quarter=s.invoice_quarter) }}">CSV</a>
+							<a href="{{ url_for('ui.submissions_participants', invoice_year=s.invoice_year, invoice_quarter=s.invoice_quarter) }}">Details</a>
+							<a href="{{ url_for('ui.submissions_csv', invoice_year=s.invoice_year, invoice_quarter=s.invoice_quarter) }}">CSV</a>
 						</td>
 					</tr>
 				{% endfor %}
 			</tbody>
 		</table>		
-</section>
 
-{{ formhelper.render_pagination(submissions, 'submissions_index') }}
+	{{ formhelper.render_pagination(submissions, 'ui.submissions_index') }}
+
+</section>
 
 {% endblock %}

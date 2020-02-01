@@ -55,6 +55,10 @@ class Practice(db.Model):
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
     status = db.Column(db.Integer, nullable=True)
 
+    @property
+    def full_address(self):
+        return ', '.join([a for a in [self.street_address, self.town, self.city, self.county, self.postcode] if a])
+
 
 class PracticeGroupPractice(db.Model):
 

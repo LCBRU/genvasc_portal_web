@@ -7,7 +7,7 @@ from .. import blueprint
 from portal.database import db
 from portal.models import (
     Recruit,
-    PracticeRegistration,
+    Practice,
 )
 
 
@@ -20,8 +20,6 @@ def submissions_index(page=1):
         Recruit.invoice_year,
         Recruit.invoice_quarter,
         func.count().label('participants')
-    ).join(
-        Recruit.recruit
     ).filter(
         Recruit.invoice_year != ''
     ).filter(
@@ -50,9 +48,7 @@ def submissions_index(page=1):
 def submissions_participants(invoice_year, invoice_quarter, page=1):
 
     q = Recruit.query.join(
-        Recruit, Recruit.recruit
-    ).join(
-        PracticeRegistration, Recruit.practice_registration
+        Practice, Recruit.practice
     ).filter(
         Recruit.invoice_year == invoice_year
     ).filter(
@@ -61,7 +57,7 @@ def submissions_participants(invoice_year, invoice_quarter, page=1):
 
     participants = (
         q.order_by(
-            PracticeRegistration.code,
+            Practice.code,
             Recruit.date_recruited.asc()
         ).paginate(
             page=page,
@@ -80,7 +76,7 @@ def submissions_csv(invoice_year, invoice_quarter):
     COL_PATIENT_ID = 'Patient ID'
     COL_PRACTICE_CODE = 'Practice Code'
     COL_PRACTICE_NAME = 'Practice Name'
-    COL_PRACTICE_ADDRESS = 'Prcatice Address'
+    COL_PRACTICE_ADDRESS = 'Practice Address'
     COL_CCG = 'CCG'
 
     fieldnames = [
@@ -104,9 +100,7 @@ def submissions_csv(invoice_year, invoice_quarter):
     output.writeheader()
     
     q = Recruit.query.join(
-        Recruit, Recruit.recruit
-    ).join(
-        PracticeRegistration, Recruit.practice_registration
+        Practice, Recruit.practice
     ).filter(
         Recruit.invoice_year == invoice_year
     ).filter(
@@ -116,19 +110,19 @@ def submissions_csv(invoice_year, invoice_quarter):
     )
 
     participants = q.order_by(
-            PracticeRegistration.code,
+            Practice.code,
             Recruit.date_recruited.asc()
         ).all()
 
     for p in participants:
         output.writerow({
-            COL_RECRUITED_DATE: p.recruit.date_recruited,
+            COL_RECRUITED_DATE: p.date_recruited,
             COL_STATUS: p.status,
             COL_PATIENT_ID: p.study_id,
-            COL_PRACTICE_CODE: p.recruit.practice_registration.code,
-            COL_PRACTICE_NAME: p.recruit.practice_registration.practice.name,
-            COL_PRACTICE_ADDRESS: p.recruit.practice_registration.practice.address,
-            COL_CCG: p.recruit.practice_registration.practice.ccg_name
+            COL_PRACTICE_CODE: p.practice.code,
+            COL_PRACTICE_NAME: p.practice.name,
+            COL_PRACTICE_ADDRESS: p.practice.full_address,
+            COL_CCG: p.practice.ccg
     })
 
     resp = make_response(si.getvalue())

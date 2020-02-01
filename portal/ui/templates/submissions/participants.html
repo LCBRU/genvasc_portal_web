@@ -24,13 +24,13 @@
 			<tbody>
 				{% for p in participants.items %}
 					<tr>
-						<td>{{ p.recruit.date_recruited | date_format }}</td>
+						<td>{{ p.date_recruited | date_format }}</td>
 						<td>{{ p.status }}</td>
 						<td>{{ p.study_id }}</td>
-						<td>{{ p.recruit.practice_registration.code }}</td>
-						<td>{{ p.recruit.practice_registration.practice.name }}</td>
-						<td>{{ p.recruit.practice_registration.practice.address }}</td>
-						<td>{{ p.recruit.practice_registration.practice.ccg_name }}</td>
+						<td>{{ p.practice.code }}</td>
+						<td>{{ p.practice.name }}</td>
+						<td>{{ p.practice.full_address }}</td>
+						<td>{{ p.practice.ccg }}</td>
 					</tr>
 				{% endfor %}
 			</tbody>
