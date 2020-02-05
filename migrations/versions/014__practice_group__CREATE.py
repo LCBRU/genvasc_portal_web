@@ -5,6 +5,7 @@ from sqlalchemy import (
     Integer,
     NVARCHAR,
     UniqueConstraint,
+    PrimaryKeyConstraint,
 )
 
 
@@ -17,16 +18,15 @@ def upgrade(migrate_engine):
     t = Table(
         "practice_group",
         meta,
-        Column("id", Integer, primary_key=True),
-        Column("type", NVARCHAR(255), index=True),
-        Column("project_id", Integer, index=True),
-        Column("identifier", Integer, index=True),
+        Column("type", NVARCHAR(255)),
+        Column("project_id", Integer),
+        Column("identifier", Integer),
         Column("name", NVARCHAR(255), nullable=False),
-        UniqueConstraint(
+        PrimaryKeyConstraint(
             'type',
             'project_id',
             'identifier',
-            name='uix__practice_group__type__project_id__identifier'
+            name='pk__practice_group__type__project_id__identifier'
         ),
     )
     t.create()

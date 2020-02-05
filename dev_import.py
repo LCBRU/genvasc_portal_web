@@ -203,8 +203,9 @@ def import_practice_groups():
     with etl_import_database() as r_db:
         for r in r_db.execute(practice_group_table.select()):
             imports.append(PracticeGroup(
-                id=r['id'],
+                project_id=r['project_id'],
                 type=r['type'],
+                identifier=r['identifier'],
                 name=r['name'],
             ))
 
@@ -217,14 +218,12 @@ def import_practice_groups():
 def import_practice_groups_practices():
     db.engine.execute("""
         CREATE TABLE IF NOT EXISTS etl_practice_groups_practices (
-            practice_group_id INT,
+            practice_group_type VARCHAR(200),
+            practice_group_project_id INT,
+            practice_group_identifier INT,
             practice_code VARCHAR(255),
-            PRIMARY KEY (practice_group_id, practice_code)
+            PRIMARY KEY (practice_group_type, practice_group_project_id, practice_group_identifier, practice_code)
         );
-        """)
-
-    db.engine.execute("""
-        CREATE INDEX idx__etl_practice_groups_practices__practice_code__practice_group_id ON etl_practice_groups_practices(practice_code, practice_group_id);
         """)
 
     imports = []
@@ -232,7 +231,9 @@ def import_practice_groups_practices():
     with etl_import_database() as r_db:
         for r in r_db.execute(practice_groups_practices_table.select()):
             imports.append(PracticeGroupPractice(
-                practice_group_id=r['practice_group_id'],
+                practice_group_type=r['practice_group_type'],
+                practice_group_project_id=r['practice_group_project_id'],
+                practice_group_identifier=r['practice_group_identifier'],
                 practice_code=r['practice_code'],
             ))
 

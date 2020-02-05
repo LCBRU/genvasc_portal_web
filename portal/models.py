@@ -1,13 +1,15 @@
 from datetime import datetime
 from portal import db
 from flask_security import UserMixin, RoleMixin
+from sqlalchemy import ForeignKeyConstraint
 
 
 class PracticeGroup(db.Model):
 
     __tablename__ = 'practice_group'
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String, nullable=False)
+    project_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    identifier = db.Column(db.String, primary_key=True, nullable=False)
+    type = db.Column(db.String, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
 
     __mapper_args__ = {
@@ -42,7 +44,7 @@ class Practice(db.Model):
     __tablename__ = 'etl_practice_detail'
 
     project_id = db.Column(db.Integer, nullable=False)
-    ccg = db.Column(db.Integer, nullable=True)
+    ccg = db.Column(db.Integer, nullable=False)
     federation = db.Column(db.Integer, nullable=True)
     code = db.Column(db.String, nullable=False, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -56,6 +58,20 @@ class Practice(db.Model):
     status = db.Column(db.Integer, nullable=True)
 
     @property
+    def ccg_name(self):
+        if self.project_id == 29:
+            return {
+                3 : 'Corby',
+                4 : 'Nene',
+            }[self.ccg]
+        elif self.project_id == 53:
+            return {
+                0 : 'NHS Leicester City CCG',
+                1 : 'NHS East Leicestershire and Rutland CCG',
+                2 : 'NHS West Leicestershire CCG',
+            }[self.ccg]
+
+    @property
     def full_address(self):
         return ', '.join([a for a in [self.street_address, self.town, self.city, self.county, self.postcode] if a])
 
@@ -64,8 +80,16 @@ class PracticeGroupPractice(db.Model):
 
     __tablename__ = 'etl_practice_groups_practices'
 
-    practice_group_id = db.Column(db.Integer, primary_key=True)
     practice_code = db.Column(db.String, nullable=False, primary_key=True)
+    practice_group_project_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    practice_group_identifier = db.Column(db.String, primary_key=True, nullable=False)
+    practice_group_type = db.Column(db.String, primary_key=True, nullable=False)
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [practice_group_project_id, practice_group_identifier, practice_group_type],
+            [PracticeGroup.project_id, PracticeGroup.identifier, PracticeGroup.type]
+        ), )
 
 
 class Role(db.Model, RoleMixin):

@@ -2,7 +2,9 @@ CREATE VIEW etl_practice_groups_practices AS
 
 SELECT
 	practice_code,
-	(project_id * 1000000) + (0 * 1000) + project_id AS practice_group_id
+	'Management Area' AS practice_group_type,
+	project_id AS practice_group_project_id,
+	project_id AS practice_group_identifier
 FROM (
 	SELECT
 		project_id,
@@ -21,7 +23,9 @@ UNION
 
 SELECT
 	practice_code,
-	(project_id * 1000000) + (1 * 1000) + ccg AS practice_group_id
+	'CCG' AS practice_group_type,
+	project_id AS practice_group_project_id,
+	ccg AS practice_group_identifier
 FROM (
 	SELECT
 		project_id,
@@ -42,7 +46,9 @@ UNION
 
 SELECT
 	practice_code,
-	(project_id * 1000000) + (2 * 1000) + federation AS practice_group_id
+	'Federation' AS practice_group_type,
+	project_id AS practice_group_project_id,
+	federation AS practice_group_identifier
 FROM (
 	SELECT
 		project_id,

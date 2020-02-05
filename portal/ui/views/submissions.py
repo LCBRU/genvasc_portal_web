@@ -122,7 +122,7 @@ def submissions_csv(invoice_year, invoice_quarter):
             COL_PRACTICE_CODE: p.practice.code,
             COL_PRACTICE_NAME: p.practice.name,
             COL_PRACTICE_ADDRESS: p.practice.full_address,
-            COL_CCG: p.practice.ccg
+            COL_CCG: p.practice.ccg_name
     })
 
     resp = make_response(si.getvalue())

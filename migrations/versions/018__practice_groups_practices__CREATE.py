@@ -4,6 +4,7 @@ from sqlalchemy import (
     Column,
     Integer,
     ForeignKey,
+    NVARCHAR,
 )
 
 
@@ -19,8 +20,10 @@ def upgrade(migrate_engine):
     t = Table(
         "practice_groups_practices",
         meta,
-        Column("practice_group_id", Integer, ForeignKey(p.c.id), index=True, nullable=False),
-        Column("practice_id", Integer, ForeignKey(pg.c.id), index=True, nullable=False),
+        Column("practice_group_type", NVARCHAR(200), ForeignKey(pg.c.type), index=True, nullable=False),
+        Column("practice_group_project_id", Integer, ForeignKey(pg.c.project_id), index=True, nullable=False),
+        Column("practice_group_identifier", Integer, ForeignKey(pg.c.identifier), index=True, nullable=False),
+        Column("practice_code", Integer, ForeignKey(p.c.code), index=True, nullable=False),
     )
     t.create()
 

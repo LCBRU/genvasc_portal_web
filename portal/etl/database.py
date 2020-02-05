@@ -29,15 +29,18 @@ practice_table = Table(
 
 practice_group_table = Table(
     'etl_practice_group', import_meta,
-    Column('id', Integer),
-    Column('type', Integer),
+    Column('project_id', Integer),
+    Column('type', String(255)),
+    Column('identifier', String(255)),
     Column('name', String(255)),
 )
 
 
 practice_groups_practices_table = Table(
     'etl_practice_groups_practices', import_meta,
-    Column('practice_group_id', Integer),
+    Column('practice_group_type', String(255)),
+    Column('practice_group_project_id', Integer),
+    Column('practice_group_identifier', Integer),
     Column('practice_code', String(255)),
 )
 
