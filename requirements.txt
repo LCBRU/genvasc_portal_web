@@ -19,3 +19,4 @@ sqlalchemy-migrate
 celery
 urllib3
 python-dateutil
+Flask-Admin

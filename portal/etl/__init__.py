@@ -45,7 +45,6 @@ def import_user():
 
             if user is None:
                 user = User(email=email)
-                user.password = ''.join(random.choice(string.ascii_lowercase) for _ in range(20))
             
             ds = list(details)
 

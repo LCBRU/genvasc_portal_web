@@ -18,6 +18,10 @@
             <a class="navbar-brand fas fa-home" href="{{ url_for('ui.index') }}"></a>
           </li>
   
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('ui.index') }}">Practices</a>
+          </li>
+
           {% if current_user.is_admin %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('ui.submissions_index') }}">Submissions</a>
@@ -34,6 +38,12 @@
                 <a class="dropdown-item" href="{{ url_for('ui.help') }}">Help</a>
             </div>
           </li>
+
+          {% if current_user.is_admin %}
+            <li class="nav-item">
+              <a class="nav-link" href="/admin">Admin</a>
+            </li>
+          {% endif %}
 
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.full_name }}</a>

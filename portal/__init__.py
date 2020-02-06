@@ -10,6 +10,7 @@ from .utils import ReverseProxied
 from .ui import blueprint as ui_blueprint
 from .celery import init_celery, celery
 from .etl import init_etl
+from .admin import init_admin
 
 def create_app(config=BaseConfig):
     app = Flask(__name__)
@@ -26,6 +27,7 @@ def create_app(config=BaseConfig):
         init_security(app)
         init_celery(app)
         init_etl(app)
+        init_admin(app)
 
     app.register_blueprint(ui_blueprint)
 

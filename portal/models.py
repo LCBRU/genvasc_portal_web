@@ -1,3 +1,5 @@
+import random
+import string
 from datetime import datetime
 from portal import db
 from flask_security import UserMixin, RoleMixin
@@ -11,6 +13,9 @@ class PracticeGroup(db.Model):
     identifier = db.Column(db.String, primary_key=True, nullable=False)
     type = db.Column(db.String, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
+
+    def __str__(self):
+        return f"{self.type}: {self.name}"
 
     __mapper_args__ = {
         "polymorphic_identity": "PracticeGroup",
@@ -99,6 +104,9 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
+    def __str__(self):
+        return self.name
+
 
 roles_users = db.Table(
     'roles_users',
@@ -127,11 +135,37 @@ practices_users = db.Table(
 )
 
 
+practice_groups_users = db.Table(
+    'practice_groups_users',
+    db.Column(
+        'user_id',
+        db.Integer(),
+        db.ForeignKey('user.id'),
+    ),
+    db.Column(
+        'practice_group_type',
+        db.String(),
+    ),
+    db.Column(
+        'practice_group_project_id',
+        db.Integer(),
+    ),
+    db.Column(
+        'practice_group_identifier',
+        db.Integer(),
+    ),
+    ForeignKeyConstraint(
+        ['practice_group_type', 'practice_group_project_id', 'practice_group_identifier'],
+        ['practice_group.type', 'practice_group.project_id', 'practice_group.identifier'],
+    ),
+)
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, index=True)
     email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
+    password = db.Column(db.String(255), default=''.join(random.choice(string.ascii_lowercase) for _ in range(20)))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     current_portal_user_yn = db.Column(db.Boolean)
@@ -148,11 +182,19 @@ class User(db.Model, UserMixin):
         'Role',
         secondary=roles_users,
         backref=db.backref('users', lazy='dynamic'),
+        collection_class=set,
     )
     practices = db.relationship(
         'Practice',
         secondary=practices_users,
         backref=db.backref('users', lazy='dynamic'),
+        collection_class=set,
+    )
+    practice_groups = db.relationship(
+        'PracticeGroup',
+        secondary=practice_groups_users,
+        backref=db.backref('users', lazy='dynamic'),
+        collection_class=set,
     )
     last_update_timestamp = db.Column(db.Integer, nullable=True)
 
