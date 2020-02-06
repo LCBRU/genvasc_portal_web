@@ -1,32 +1,5 @@
-from functools import wraps
-from flask import request, flash, redirect, url_for
+from flask import request, url_for
 from urllib.parse import urlparse, urljoin
-
-
-def must_exist(
-    model,
-    field,
-    request_field,
-    error_redirect=None,
-    message=u'The value does not exist'
-):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            count = model.query.filter(
-                field == request.view_args.get(request_field)).count()
-
-            if count == 0:
-                flash("{0}: ({1} = '{2}')".format(
-                    message,
-                    request_field,
-                    request.view_args.get(request_field)), 'error')
-                return redirect(redirect_back_url(error_redirect))
-
-            return f(*args, **kwargs)
-
-        return decorated_function
-    return decorator
 
 
 def redirect_back_url(default='index'):

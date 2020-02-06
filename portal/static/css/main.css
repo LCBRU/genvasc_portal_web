@@ -160,6 +160,10 @@ section {
   box-shadow: 0 0 0 0.2rem rgba(70, 168, 108, 0.5);
 }
 
+.alert h2, .alert p {
+  display: inline;
+}
+
 /* Recolour success buttons */ 
 .btn-success {
   color: #fff;

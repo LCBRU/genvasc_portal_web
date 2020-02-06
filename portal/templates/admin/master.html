@@ -1,11 +1,12 @@
-<style type="text/css">
-    .select2-container, .select2-container-active, #title, #author, #description {
-        width: 75% !important;
-    }
-</style>
-
 {% extends admin_base_template %}
 
 {% block brand %}
-<a class="brand" href="/">{{ admin_view.admin.name }}</a>
+
+    <style type="text/css">
+        .select2-container, .select2-container-active, #title, #author, #description, textarea {
+            width: 75% !important;
+        }
+    </style>
+
+    <a class="brand" href="/">{{ admin_view.admin.name }}</a>
 {% endblock %}

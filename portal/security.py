@@ -124,6 +124,6 @@ def init_users():
             active=True,
         )
         db.session.add(u)
-        u.roles.append(Role.query.filter_by(name=Role.ADMIN_ROLENAME).one_or_none())
+        u.roles.add(Role.query.filter_by(name=Role.ADMIN_ROLENAME).one_or_none())
 
         db.session.commit()

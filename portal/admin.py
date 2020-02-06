@@ -9,7 +9,9 @@ from .models import (
     User,
     Role,
     PracticeGroup,
+    Message,
 )
+from wtforms import TextAreaField
 
 
 class QuerySelectMultipleFieldSet(fields.QuerySelectMultipleField):
@@ -26,6 +28,15 @@ class CustomView(ModelView):
 
     def is_accessible(self):
         return current_user.is_admin
+
+
+class MessageView(CustomView):
+    form_choices = {'category': [
+        ('warning', 'Warning'), ('error', 'Error'), ('success', 'Success')
+    ]}
+    form_overrides = {
+        'message' : TextAreaField
+    }
 
 
 class UserView(CustomView):
@@ -74,3 +85,4 @@ class UserView(CustomView):
 def init_admin(app):
     flask_admin = admin.Admin(app, name="GENVASC GP Portal", url="/admin")
     flask_admin.add_view(UserView(User, db.session))
+    flask_admin.add_view(MessageView(Message, db.session))

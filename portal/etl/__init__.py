@@ -55,9 +55,9 @@ def import_user():
             user.last_update_timestamp = u['last_update_timestamp']
             user.is_imported = True
 
-            user.practices = Practice.query.filter(
+            user.practices = set(Practice.query.filter(
                 Practice.code.in_([d['practice_code'] for d in ds])
-            ).all()
+            ).all())
 
             users.append(user)
 

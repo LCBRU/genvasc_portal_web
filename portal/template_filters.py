@@ -1,4 +1,7 @@
 from datetime import datetime
+from flask import get_flashed_messages
+from portal.models import Message
+
 
 def init_template_filters(app):
     @app.template_filter("yes_no")
@@ -42,3 +45,11 @@ def init_template_filters(app):
     @app.context_processor
     def inject_now():
         return {'current_year': datetime.utcnow().strftime("%Y")}
+
+
+    @app.context_processor
+    def inject_notes():
+        result = list(get_flashed_messages(with_categories=True))
+        result.extend([(m.category, m.message) for m in Message.query.all()])
+
+        return {'notes': result}

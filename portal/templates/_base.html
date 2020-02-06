@@ -6,7 +6,7 @@
 
   <header class="pageheader">
     <div class="container">
-      <h1>GENVASC</h1>
+      <h1>GENVASC Portal</h1>
     </div>
   </header>
 
@@ -60,59 +60,36 @@
 
   <div class="container">
 
-    <div class="justify-content-center">
-      <div class="alert alert-warning" role="alert">
-          <i class="fas fa-exclamation"></i>
-          <span class="sr-only">Warning:</span>
-          We have redesigned our full and abbreviated participant information sheets.
-          They now have our new logo, are on A4 sheets and the abbreviated sheet is in a larger font.
-          The versions have not changed (full leaflet is version 4 and the abbreviated is version 3),
-          so if you have existing stock this is still fine to use.  We hope you like them!
+    {% for category, message in notes %}
+
+      {% set class="alert-info" %}
+      {% set fas_class="fa-comment" %}
+
+      {% if category == "warning" %}
+        {% set class="alert-warning" %}
+        {% set fas_class="fa-exclamation" %}
+      {% elif category == "error" %}
+        {% set class="alert-danger" %}
+        {% set fas_class="fa-exclamation" %}
+      {% elif category == "success" %}
+        {% set class="alert-success" %}
+        {% set fas_class="fa-check" %}
+      {% endif %}
+
+      <div class="justify-content-center">
+        <div class="alert {{class}}" role="alert">
+          <h2>
+            <i class="fas {{fas_class}}"></i>
+            <span class="sr-only">{{category}}:</span>
+          </h2>
+          <p>{{message}}</p>
+        </div>
       </div>
-    </div>
 
-    <div class="justify-content-center">
-      <div class="alert alert-warning" role="alert">
-          <i class="fas fa-exclamation"></i>
-          <span class="sr-only">Warning:</span>
-          Important message to all recruiting sites.
-          Patients attending their 5 year follow-up health
-          check who are already GENVASC participants cannot
-          be recruited a second time. Duplicate recruits
-          will be excluded and you will not be reimbursed for their samples.
-      </div>
-    </div>
+    {% endfor %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
+    {% block errors %}{% endblock %}
 
-          {% set class="alert-info" %}
-          {% set fas_class="fa-comment" %}
-
-          {% if category == "warning" %}
-            {% set class="alert-warning" %}
-            {% set fas_class="fa-exclamation" %}
-          {% elif category == "error" %}
-            {% set class="alert-danger" %}
-            {% set fas_class="fa-exclamation" %}
-          {% elif category == "success" %}
-            {% set class="alert-success" %}
-            {% set fas_class="fa-check" %}
-          {% endif %}
-
-
-          <div class="justify-content-center">
-            <div class="alert {{class}}" role="alert">
-                <i class="fas {{fas_class}}"></i>
-                <span class="sr-only">{{category}}:</span>
-                {{message}}
-            </div>
-          </div>
-
-        {% endfor %}
-      {% endwith %}
-
-      {% block errors %}{% endblock %}
   </div>
         
   <div id="content" class="container">
