@@ -11,8 +11,9 @@ def assert_practice_user():
         def decorated_function(*args, **kwargs):
             practice = Practice.query.get_or_404(kwargs.get('code'))
 
-            if practice not in current_user.all_practices:
-                abort(403)
+            if not current_user.is_admin:
+                if practice not in current_user.all_practices:
+                    abort(403)
 
             return f(*args, **kwargs)
 
