@@ -17,7 +17,6 @@ from portal.models import (
     Delegate,
     Practice,
     PracticeGroup,
-    PracticeGroupPractice,
 )
 from portal import create_app
 
@@ -188,9 +187,11 @@ def import_practices():
 def import_practice_groups():
     db.engine.execute("""
         CREATE TABLE IF NOT EXISTS etl_practice_group (
-            id INT PRIMARY KEY,
+            project_id INT,
+            identifier VARCHAR(255),
             type VARCHAR(255),
-            name VARCHAR(255)
+            name VARCHAR(255),
+            PRIMARY KEY (project_id, identifier, type)
         );
         """)
 
@@ -226,19 +227,22 @@ def import_practice_groups_practices():
         );
         """)
 
-    imports = []
-
     with etl_import_database() as r_db:
         for r in r_db.execute(practice_groups_practices_table.select()):
-            imports.append(PracticeGroupPractice(
-                practice_group_type=r['practice_group_type'],
-                practice_group_project_id=r['practice_group_project_id'],
-                practice_group_identifier=r['practice_group_identifier'],
-                practice_code=r['practice_code'],
-            ))
+            try:
+                p = Practice.query.filter_by(code=r['practice_code']).one()
+                pg = PracticeGroup.query.filter_by(
+                    type=r['practice_group_type'],
+                    project_id=r['practice_group_project_id'],
+                    identifier=r['practice_group_identifier'],
+                ).one()
 
-    db.session.add_all(imports)
-    db.session.flush()
+                pg.practices.add(p)
+                db.session.add(pg)
+            except:
+                print(r['practice_group_type'])
+                print(r['practice_group_project_id'])
+                print(r['practice_group_identifier'])
 
     db.session.commit()
 

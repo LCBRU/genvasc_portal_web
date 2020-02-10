@@ -55,7 +55,7 @@ practice_groups_users = db.Table(
     ),
     ForeignKeyConstraint(
         ['practice_group_type', 'practice_group_project_id', 'practice_group_identifier'],
-        ['practice_group.type', 'practice_group.project_id', 'practice_group.identifier'],
+        ['etl_practice_group.type', 'etl_practice_group.project_id', 'etl_practice_group.identifier'],
     ),
 )
 
@@ -77,18 +77,18 @@ practice_groups_practices = db.Table(
     ),
     db.Column(
         'practice_group_identifier',
-        db.Integer(),
+        db.String(),
     ),
     ForeignKeyConstraint(
         ['practice_group_type', 'practice_group_project_id', 'practice_group_identifier'],
-        ['practice_group.type', 'practice_group.project_id', 'practice_group.identifier'],
+        ['etl_practice_group.type', 'etl_practice_group.project_id', 'etl_practice_group.identifier'],
     ),
 )
 
 
 class PracticeGroup(db.Model):
 
-    __tablename__ = 'practice_group'
+    __tablename__ = 'etl_practice_group'
     project_id = db.Column(db.Integer, primary_key=True, nullable=False)
     identifier = db.Column(db.String, primary_key=True, nullable=False)
     type = db.Column(db.String, primary_key=True, nullable=False)

@@ -5,6 +5,7 @@ from sqlalchemy import (
     Integer,
     ForeignKey,
     NVARCHAR,
+    UniqueConstraint,
 )
 
 
@@ -15,15 +16,21 @@ def upgrade(migrate_engine):
     meta.bind = migrate_engine
 
     u = Table("user", meta, autoload=True)
-    pg = Table("practice_group", meta, autoload=True)
 
     t = Table(
         "practice_groups_users",
         meta,
-        Column("practice_group_type", NVARCHAR(200), ForeignKey(pg.c.type), index=True, nullable=False),
-        Column("practice_group_project_id", Integer, ForeignKey(pg.c.project_id), index=True, nullable=False),
-        Column("practice_group_identifier", Integer, ForeignKey(pg.c.identifier), index=True, nullable=False),
+        Column("practice_group_type", NVARCHAR(200), index=True, nullable=False),
+        Column("practice_group_project_id", Integer, index=True, nullable=False),
+        Column("practice_group_identifier", Integer, index=True, nullable=False),
         Column("user_id", Integer, ForeignKey(u.c.id), index=True, nullable=False),
+        UniqueConstraint(
+            'user_id',
+            'practice_group_type',
+            'practice_group_project_id',
+            'practice_group_identifier',
+            name='uix_practice_groups_users__user_id__practice_group'
+        ),
     )
     t.create()
 

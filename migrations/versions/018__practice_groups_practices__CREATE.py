@@ -12,23 +12,7 @@ meta = MetaData()
 
 
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
-
-    p = Table("etl_practice", meta, autoload=True)
-    pg = Table("practice_group", meta, autoload=True)
-
-    t = Table(
-        "practice_groups_practices",
-        meta,
-        Column("practice_group_type", NVARCHAR(200), ForeignKey(pg.c.type), index=True, nullable=False),
-        Column("practice_group_project_id", Integer, ForeignKey(pg.c.project_id), index=True, nullable=False),
-        Column("practice_group_identifier", Integer, ForeignKey(pg.c.identifier), index=True, nullable=False),
-        Column("practice_code", Integer, ForeignKey(p.c.code), index=True, nullable=False),
-    )
-    t.create()
-
+    pass
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
-    t = Table("practice_groups_practices", meta, autoload=True)
-    t.drop()
+    pass
