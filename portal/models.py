@@ -131,6 +131,14 @@ class ManagementArea(PracticeGroup):
     }
 
 
+class PracticeStatus(db.Model):
+
+    __tablename__ = 'etl_practice_status'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, nullable=False)
+
+
 class Practice(db.Model):
 
     __tablename__ = 'etl_practice_detail'
@@ -147,7 +155,8 @@ class Practice(db.Model):
     postcode = db.Column(db.String, nullable=True)
     partners = db.Column(db.String, nullable=True)
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
-    status = db.Column(db.Integer, nullable=True)
+    status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.id), nullable=True)
+    status = db.relationship(PracticeStatus)
 
     @property
     def ccg_name(self):

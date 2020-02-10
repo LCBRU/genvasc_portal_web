@@ -3,7 +3,28 @@
 
 {% block content %}
 
-    <h1>{{ practice.code }}: {{ practice.name }}</h1>
+    <header>
+      <h1>
+        <span>{{ practice.code }}: {{ practice.name }}</span>
+
+        {% if practice.status_id == 0 %}
+          {% set status_class="badge-warning" %}
+        {% elif practice.status_id == 1 %}
+          {% set status_class="badge-success" %}
+        {% elif practice.status_id == 2 %}
+          {% set status_class="badge-danger" %}
+        {% endif %}
+        
+        <span class="float-right badge {{ status_class }}">{{ practice.status.name }}</span>
+
+        {% if practice.genvasc_initiated %}
+          <span class="float-right badge badge-success">GENVASC Initiated</span>
+        {% else %}
+          <span class="float-right badge badge-danger">Not GENVASC Initiated</span>
+        {% endif %}
+      </h1>
+
+    </header>
 
     <ul class="nav nav-tabs">
       <li class="nav-item">

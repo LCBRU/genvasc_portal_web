@@ -14,8 +14,39 @@
       <ul class="list-group">
         {% for p in practices.items %}
             <li class="list-group-item">
-              <a href="{{ url_for('ui.recruits_index', code=p.code) }}">{{ p.code }}: {{ p.name }}</a>
-            </li>
+              <header>
+                <h1>
+                
+                  <a href="{{ url_for('ui.recruits_index', code=p.code) }}">{{ p.code }}: {{ p.name }}</a>
+
+                  {% if p.status_id == 0 %}
+                    {% set status_class="badge-warning" %}
+                  {% elif p.status_id == 1 %}
+                    {% set status_class="badge-success" %}
+                  {% elif p.status_id == 2 %}
+                    {% set status_class="badge-danger" %}
+                  {% endif %}
+                  
+                  <span class="float-right badge {{ status_class }}">{{ p.status.name }}</span>
+      
+                  {% if p.genvasc_initiated %}
+                    <span class="float-right badge badge-success">GENVASC Initiated</span>
+                  {% else %}
+                    <span class="float-right badge badge-danger">Not GENVASC Initiated</span>
+                  {% endif %}
+                </h1>
+
+              </header>
+            <dl>
+              <div class="row">
+
+                <div class="col-sm-3 col-lg-2">
+                  <dt>REDCAP details</dt>
+                  <dd><a href="https://uhlbriccsext.uhl-tr.nhs.uk/redcap/redcap_v7.2.2/DataEntry/record_home.php?pid={{p.project_id}}&arm=1&id={{p.code}}" target="_blank">Click Here</a></dd>
+                </div>
+              </div>
+            </dl>
+          </li>
         {% endfor %}
       </ul>
 

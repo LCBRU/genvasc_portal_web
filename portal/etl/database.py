@@ -9,6 +9,14 @@ recruit_etl_meta = MetaData()
 import_meta = MetaData()
 
 
+practice_status_table = Table(
+    'etl_practice_status', import_meta,
+    Column('id', Integer),
+    Column('name', String(255)),
+)
+
+
+
 practice_table = Table(
     'etl_practice_detail', import_meta,
     Column('project_id', Integer),
@@ -23,7 +31,7 @@ practice_table = Table(
     Column('federation', Integer),
     Column('partners', String(100)),
     Column('genvasc_initiated', Integer),
-    Column('status', Integer),
+    Column('status_id', Integer),
 )
 
 

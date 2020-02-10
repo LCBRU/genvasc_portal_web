@@ -90,6 +90,11 @@ header.pageheader h1 {
     background-position: center left;
 }
 
+header h1 .badge {
+  margin-left: 10px;
+  font-size: 50%;
+}
+
 .navbar{
   padding: 10px 0;
 }
@@ -300,6 +305,7 @@ a.fas, a.fas:link, a.fas:hover {
 
 .list-group-item .badge {
   margin-left: 10px;
+  font-size: 80%;
 }
 
 /** SPINNER CREATION **/

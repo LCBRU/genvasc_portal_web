@@ -11,14 +11,43 @@ from portal.etl.database import (
     practice_table,
     practice_group_table,
     practice_groups_practices_table,
+    practice_status_table,
 )
 from portal.models import (
     Recruit,
     Delegate,
     Practice,
     PracticeGroup,
+    PracticeStatus,
 )
 from portal import create_app
+
+
+def import_practice_status():
+    db.engine.execute("""
+        CREATE TABLE IF NOT EXISTS etl_practice_status (
+            id INT PRIMARY KEY,
+            name VARCHAR(255)
+        );
+        """)
+
+    db.engine.execute("""
+        CREATE UNIQUE INDEX idx__etl_practice_status__name ON etl_practice_status(name);
+        """)
+
+    imports = []
+
+    with etl_import_database() as r_db:
+        for r in r_db.execute(practice_status_table.select()):
+            imports.append(PracticeStatus(
+                id=r['id'],
+                name=r['name'],
+            ))
+
+    db.session.add_all(imports)
+    db.session.flush()
+
+    db.session.commit()
 
 
 def import_recruits():
@@ -144,7 +173,7 @@ def import_practices():
             postcode VARCHAR(255),
             partners VARCHAR(255),
             genvasc_initiated BIT,
-            status INT
+            status_id INT NULL
         );
         """)
 
@@ -174,8 +203,8 @@ def import_practices():
                 postcode=r['postcode'],
                 federation=r['federation'],
                 partners=r['partners'],
-                genvasc_initiated=r['genvasc_initiated'] == 1,
-                status=r['status'],
+                genvasc_initiated=r['genvasc_initiated'] in ('1', 1),
+                status_id=r['status_id'],
             ))
 
     db.session.add_all(imports)
@@ -254,6 +283,7 @@ app = create_app()
 context = app.app_context()
 context.push()
 
+import_practice_status()
 import_practice_groups()
 import_practices()
 import_recruits()

@@ -12,7 +12,7 @@ ALTER VIEW etl_practice_detail AS
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'federation' THEN rd.value ELSE NULL END) AS federation,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'partners' THEN rd.value ELSE NULL END) AS partners,
 		COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'genvasc_initiated' THEN rd.value ELSE NULL END), 0) AS genvasc_initiated,
-		COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'status' THEN rd.value ELSE NULL END), 0) AS status
+		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'status' THEN rd.value ELSE NULL END) AS status_id
 	FROM redcap6170_briccsext.redcap_data rd
 	WHERE
 			project_id IN (29, 53)
