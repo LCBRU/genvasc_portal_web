@@ -95,6 +95,11 @@ header h1 .badge {
   font-size: 50%;
 }
 
+header h2 {
+  font-size: 18px;
+  color: #666;
+}
+
 .navbar{
   padding: 10px 0;
 }

@@ -5,7 +5,7 @@
 
     <header>
       <h1>
-        <span>{{ practice.code }}: {{ practice.name }}</span>
+        <span>{{ practice.code }}: {{ practice.name | title_case }}</span>
 
         {% if practice.status_id == 0 %}
           {% set status_class="badge-warning" %}
@@ -23,6 +23,10 @@
           <span class="float-right badge badge-danger">Not GENVASC Initiated</span>
         {% endif %}
       </h1>
+
+      {% if current_user.is_super %}
+        <h2>To view and amend full practice details see <a href="https://uhlbriccsext.uhl-tr.nhs.uk/redcap/redcap_v7.2.2/DataEntry/record_home.php?pid={{practice.project_id}}&arm=1&id={{practice.code}}" target="_blank">REDCap</a></h2>
+      {% endif %}
 
     </header>
 

@@ -42,6 +42,14 @@ def init_template_filters(app):
         else:
             return ""
 
+    @app.template_filter("separated_number")
+    def currency(value):
+        return F"{value:,}"
+
+    @app.template_filter("title_case")
+    def currency(value):
+        return value.title()
+
     @app.context_processor
     def inject_now():
         return {'current_year': datetime.utcnow().strftime("%Y")}

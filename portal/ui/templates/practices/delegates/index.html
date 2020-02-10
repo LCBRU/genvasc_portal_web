@@ -13,7 +13,7 @@
     <li class="list-group-item">
       <header>
         <h1>
-          <span>{{ d.name }}</span>
+          <span>{{ d.name | title_case }}</span>
 
           {% if d.primary_contact_yn %}
             <span class="badge badge-primary">1&deg; Contact</span>

@@ -17,7 +17,7 @@
               <header>
                 <h1>
                 
-                  <a href="{{ url_for('ui.recruits_index', code=p.code) }}">{{ p.code }}: {{ p.name }}</a>
+                  <a href="{{ url_for('ui.recruits_index', code=p.code) }}">{{ p.code }}: {{ p.name | title_case }}</a>
 
                   {% if p.status_id == 0 %}
                     {% set status_class="badge-warning" %}
@@ -35,14 +35,22 @@
                     <span class="float-right badge badge-danger">Not GENVASC Initiated</span>
                   {% endif %}
                 </h1>
+                {% if current_user.is_super %}
+                  <h2>To view and amend full practice details see <a href="https://uhlbriccsext.uhl-tr.nhs.uk/redcap/redcap_v7.2.2/DataEntry/record_home.php?pid={{p.project_id}}&arm=1&id={{p.code}}" target="_blank">REDCap</a></h2>
+                {% endif %}
 
               </header>
             <dl>
               <div class="row">
 
                 <div class="col-sm-3 col-lg-2">
-                  <dt>REDCAP details</dt>
-                  <dd><a href="https://uhlbriccsext.uhl-tr.nhs.uk/redcap/redcap_v7.2.2/DataEntry/record_home.php?pid={{p.project_id}}&arm=1&id={{p.code}}" target="_blank">Click Here</a></dd>
+                  <dt>Recruits</dt>
+                  <dd>{{ p.recruited_count | separated_number }}</dd>
+                </div>
+
+                <div class="col-sm-3 col-lg-2">
+                  <dt>Last Recruitment</dt>
+                  <dd>{{ p.last_recruited | date_format }}</dd>
                 </div>
               </div>
             </dl>

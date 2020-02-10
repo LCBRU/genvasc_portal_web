@@ -6,6 +6,8 @@ from portal import db
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import ForeignKeyConstraint
 
+from sqlalchemy.orm import column_property
+from sqlalchemy import select, func
 
 roles_users = db.Table(
     'roles_users',
@@ -139,6 +141,36 @@ class PracticeStatus(db.Model):
     name = db.Column(db.String, nullable=False)
 
 
+class Recruit(db.Model):
+    __tablename__ = 'etl_recruit'
+
+    status = db.Column(db.String(100))
+    nhs_number = db.Column(db.String(20), nullable=False)
+    study_id = db.Column(db.String(100))
+    practice_code = db.Column(db.String(100), db.ForeignKey("etl_practice_detail.code"), nullable=True)
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    date_of_birth = db.Column(db.Date, nullable=False)
+    civicrm_contact_id = db.Column(db.Integer)
+    civicrm_case_id = db.Column(db.Integer, primary_key=True)
+    processed_date = db.Column(db.Date)
+    date_recruited = db.Column(db.Date, nullable=False)
+    invoice_year = db.Column(db.Integer)
+    invoice_quarter = db.Column(db.String(50))
+    reimbursed_status = db.Column(db.String(50))
+
+    @property
+    def full_name(self):
+        return '{} {}'.format(self.first_name or '', self.last_name or '')
+
+    @property
+    def invoice_period(self):
+        return '{} {}'.format(
+            self.invoice_year or '',
+            self.invoice_quarter or '',
+        ).strip()
+
+
 class Practice(db.Model):
 
     __tablename__ = 'etl_practice_detail'
@@ -157,6 +189,10 @@ class Practice(db.Model):
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
     status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.id), nullable=True)
     status = db.relationship(PracticeStatus)
+    recruits = db.relationship(Recruit, backref='practice', lazy=True)
+
+    recruited_count = column_property(select([func.count()]).where(Recruit.practice_code==code))
+    last_recruited = column_property(select([func.max(Recruit.date_recruited)]).where(Recruit.practice_code==code))
 
     @property
     def ccg_name(self):
@@ -226,6 +262,10 @@ class User(db.Model, UserMixin):
     last_update_timestamp = db.Column(db.Integer, nullable=True)
 
     @property
+    def is_super(self):
+        return self.is_admin or len(self.practice_groups) > 0
+
+    @property
     def is_admin(self):
         return self.has_role(Role.ADMIN_ROLENAME)
 
@@ -240,37 +280,6 @@ class User(db.Model, UserMixin):
     @property
     def full_name(self):
         return '{} {}'.format(self.first_name or '', self.last_name or '').strip() or self.email
-
-
-class Recruit(db.Model):
-    __tablename__ = 'etl_recruit'
-
-    status = db.Column(db.String(100))
-    nhs_number = db.Column(db.String(20), nullable=False)
-    study_id = db.Column(db.String(100))
-    practice_code = db.Column(db.String(100), db.ForeignKey(Practice.code), nullable=True)
-    practice = db.relationship(Practice)
-    first_name = db.Column(db.String(100))
-    last_name = db.Column(db.String(100))
-    date_of_birth = db.Column(db.Date, nullable=False)
-    civicrm_contact_id = db.Column(db.Integer)
-    civicrm_case_id = db.Column(db.Integer, primary_key=True)
-    processed_date = db.Column(db.Date)
-    date_recruited = db.Column(db.Date, nullable=False)
-    invoice_year = db.Column(db.Integer)
-    invoice_quarter = db.Column(db.String(50))
-    reimbursed_status = db.Column(db.String(50))
-
-    @property
-    def full_name(self):
-        return '{} {}'.format(self.first_name or '', self.last_name or '')
-
-    @property
-    def invoice_period(self):
-        return '{} {}'.format(
-            self.invoice_year or '',
-            self.invoice_quarter or '',
-        ).strip()
 
 
 class Delegate(db.Model):

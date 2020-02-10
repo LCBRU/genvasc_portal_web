@@ -73,7 +73,7 @@
 			{% for d in delegates %}
 				<tr>
 					<td>
-                        <p>{{ d.name }}</p>
+                        <p>{{ d.name | title_case }}</p>
                         <p>{{ d.role | blank_if_none}}</p>
                         <p>{{ d.contact_email_add | blank_if_none}}</p>
                         <p>{{ d.gv_phone_a | blank_if_none}}</p>

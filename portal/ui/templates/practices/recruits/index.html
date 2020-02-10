@@ -14,7 +14,7 @@
 
       <header>
         <h1>
-          <span>{{ r.full_name }}</span>
+          <span>{{ r.full_name | title_case }}</span>
 
           {% if r.invoice_period | length > 0 %}
             <span class="float-right badge badge-info">Invoice: {{ r.invoice_period }}</span>
