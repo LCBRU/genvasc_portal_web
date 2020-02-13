@@ -1,14 +1,13 @@
 import random
 import string
 import re
-from datetime import datetime
+import datetime
 from itertools import chain
 from portal import db
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy import ForeignKeyConstraint
-
+from sqlalchemy import ForeignKeyConstraint, select, func
 from sqlalchemy.orm import column_property
-from sqlalchemy import select, func
+
 
 roles_users = db.Table(
     'roles_users',
@@ -165,7 +164,8 @@ class Recruit(db.Model):
     def exclusion_reason_stripped(self):
         re_tag = re.compile(r'(<!--.*?-->|<[^>]*>)')
         re_nbsp = re.compile(r'(&nbsp;)')
-        return re_nbsp.sub('', re_tag.sub('', self.exclusion_reason or '')).strip()
+        re_amp = re.compile(r'(&amp;)')
+        return re_amp.sub('&', re_nbsp.sub('', re_tag.sub('', self.exclusion_reason or ''))).strip()
 
     @property
     def exclusion_text(self):
@@ -201,13 +201,37 @@ class Practice(db.Model):
     county = db.Column(db.String, nullable=True)
     postcode = db.Column(db.String, nullable=True)
     partners = db.Column(db.String, nullable=True)
+    collab_ag_comp_yn = db.Column(db.Boolean, nullable=True)
+    collab_ag_signed_date = db.Column(db.Date, nullable=True)
+    isa_comp_yn = db.Column(db.Boolean, nullable=True)
+    isa_1_signed_date = db.Column(db.Date, nullable=True)
+    isa_1_caldicott_guard_end = db.Column(db.Date, nullable=True)
+    agree_66_comp_yn = db.Column(db.Boolean, nullable=True)
+    agree_66_signed_date_1 = db.Column(db.Date, nullable=True)
+    agree_66_end_date_2 = db.Column(db.Date, nullable=True)
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
     status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.id), nullable=True)
     status = db.relationship(PracticeStatus)
     recruits = db.relationship(Recruit, backref='practice', lazy=True)
 
     recruited_count = column_property(select([func.count()]).where(Recruit.practice_code==code))
+    withdrawn_count = column_property(select([func.count()]).where(Recruit.practice_code==code).where(Recruit.status=='Withdrawn'))
+    excluded_count = column_property(select([func.count()]).where(Recruit.practice_code==code).where(Recruit.status=='Excluded'))
     last_recruited = column_property(select([func.max(Recruit.date_recruited)]).where(Recruit.practice_code==code))
+
+    @property
+    def excluded_percentage(self):
+        if self.recruited_count > 0:
+            return self.excluded_count / self.recruited_count * 100
+        else:
+            return 0
+
+    @property
+    def withdrawn_percentage(self):
+        if self.recruited_count > 0:
+            return self.withdrawn_count / self.recruited_count * 100
+        else:
+            return 0
 
     @property
     def ccg_name(self):
@@ -226,6 +250,15 @@ class Practice(db.Model):
     @property
     def full_address(self):
         return ', '.join([a for a in [self.street_address, self.town, self.city, self.county, self.postcode] if a])
+
+    @property
+    def has_current_isa(self):
+        if self.isa_comp_yn and (self.isa_1_caldicott_guard_end or datetime.date.today()) >= datetime.date.today():
+            return True
+        elif self.agree_66_comp_yn and (self.agree_66_end_date_2 or datetime.date.today()) >= datetime.date.today():
+            return True
+
+        return False
 
 
 class Role(db.Model, RoleMixin):

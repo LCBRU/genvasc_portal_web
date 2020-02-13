@@ -32,6 +32,14 @@ practice_table = Table(
     Column('partners', String(100)),
     Column('genvasc_initiated', Integer),
     Column('status_id', Integer),
+    Column('collab_ag_comp_yn', Boolean),
+    Column('collab_ag_signed_date', Date),
+    Column('isa_comp_yn', Boolean),
+    Column('isa_1_signed_date', Date),
+    Column('isa_1_caldicott_guard_end', Date),
+    Column('agree_66_comp_yn', Boolean),
+    Column('agree_66_signed_date_1', Date),
+    Column('agree_66_end_date_2', Date),
 )
 
 

@@ -310,6 +310,7 @@ a.fas, a.fas:link, a.fas:hover {
 
 .list-group-item .badge {
   margin-left: 10px;
+  margin-bottom: 10px;
   font-size: 80%;
 }
 

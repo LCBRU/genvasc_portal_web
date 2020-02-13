@@ -67,7 +67,7 @@ def recruits_index(code):
 
     search_form = RecruitSearchForm(formdata = request.args)
 
-    q = Recruit.query.join(Practice, Recruit.practice).filter(Practice.code == code)
+    q = Recruit.query.filter(Recruit.practice_code == code)
     q = filter_equals_by_truefalsenone(q, search_form.excluded, Recruit.status, 'Excluded')
 
     if search_form.recruited_or_available.data.casefold() == 'true':
@@ -110,10 +110,8 @@ def reimbursements_index(code, page=1):
         Recruit.invoice_year,
         Recruit.invoice_quarter,
         func.count().label('participants')
-    ).join(
-        Recruit.practice
     ).filter(
-        Practice.code == code
+        Recruit.practice_code == code
     ).filter(
         Recruit.invoice_year != ''
     ).filter(
@@ -145,10 +143,8 @@ def reimbursements_index(code, page=1):
 def reimbursements_participants(code, invoice_year, invoice_quarter, page=1):
     practice = Practice.query.filter(Practice.code == code).first()
 
-    q = Recruit.query.join(
-        Practice, Recruit.practice
-    ).filter(
-        Practice.code == code
+    q = Recruit.query.filter(
+        Recruit.practice_code == code
     ).filter(
         Recruit.invoice_year == invoice_year
     ).filter(
@@ -172,10 +168,8 @@ def reimbursements_participants(code, invoice_year, invoice_quarter, page=1):
 def reimbursements_pdf(code, invoice_year, invoice_quarter):
     practice = Practice.query.filter(Practice.code == code).first()
 
-    q = Recruit.query.join(
-        Practice, Recruit.practice
-    ).filter(
-        Practice.code == code
+    q = Recruit.query.filter(
+        Recruit.practice_code == code
     ).filter(
         Recruit.invoice_year == invoice_year
     ).filter(
@@ -249,7 +243,7 @@ def delegates_pdf(code):
 
 
 def delegate_search_query(search_form, code):
-    q = Delegate.query.filter(Delegate.practice_code == code).join(User)
+    q = Delegate.query.filter(Delegate.practice_code == code).outerjoin(User)
 
     if search_form.search.data:
         q = q.filter(Delegate.name.like("%{}%".format(search_form.search.data)))

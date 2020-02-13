@@ -14,11 +14,16 @@
       <ul class="list-group">
         {% for p in practices.items %}
             <li class="list-group-item">
-              <header>
-                <h1>
-                
-                  <a href="{{ url_for('ui.recruits_index', code=p.code) }}">{{ p.code }}: {{ p.name | title_case }}</a>
+              <header class="row">
+                <div class="col-7">
+                  <h1><a href="{{ url_for('ui.recruits_index', code=p.code) }}">{{ p.code }}: {{ p.name | title_case }}</a></h1>
 
+                  {% if current_user.is_super %}
+                    <h2>To view and amend full practice details see <a href="https://uhlbriccsext.uhl-tr.nhs.uk/redcap/redcap_v7.2.2/DataEntry/record_home.php?pid={{p.project_id}}&arm=1&id={{p.code}}" target="_blank">REDCap</a></h2>
+                  {% endif %}
+                </div>
+
+                <div class="col-5">
                   {% if p.status_id == 0 %}
                     {% set status_class="badge-warning" %}
                   {% elif p.status_id == 1 %}
@@ -26,32 +31,77 @@
                   {% elif p.status_id == 2 %}
                     {% set status_class="badge-danger" %}
                   {% endif %}
-                  
+
                   <span class="float-right badge {{ status_class }}">{{ p.status.name }}</span>
-      
+
                   {% if p.genvasc_initiated %}
                     <span class="float-right badge badge-success">GENVASC Initiated</span>
                   {% else %}
                     <span class="float-right badge badge-danger">Not GENVASC Initiated</span>
                   {% endif %}
-                </h1>
-                {% if current_user.is_super %}
-                  <h2>To view and amend full practice details see <a href="https://uhlbriccsext.uhl-tr.nhs.uk/redcap/redcap_v7.2.2/DataEntry/record_home.php?pid={{p.project_id}}&arm=1&id={{p.code}}" target="_blank">REDCap</a></h2>
-                {% endif %}
 
+                  {% if p.has_current_isa %}
+                    <span class="float-right badge badge-success">Current ISA</span>
+                  {% else %}
+                    <span class="float-right badge badge-danger">No Current ISA</span>
+                  {% endif %}
+
+                  {% if p.collab_ag_comp_yn %}
+                    <span class="float-right badge badge-success">Collaboration Agreement</span>
+                  {% else %}
+                    <span class="float-right badge badge-danger">No Collaboration Agreement</span>
+                  {% endif %}
+                </div>
               </header>
             <dl>
               <div class="row">
+
+                {% if p.collab_ag_comp_yn %}
+                  <div class="col-xs-6 col-md-4 col-lg-3">
+                    <dt>Collaboration Signed</dt>
+                    <dd>{{ p.collab_ag_signed_date | date_format }}</dd>
+                  </div>
+                {% endif %}
+
+                {% if p.isa_comp_yn %}
+                  <div class="col-xs-6 col-md-4 col-lg-3">
+                    <dt>Initial ISA</dt>
+                    <dd>{{ p.isa_1_signed_date | date_format }} - {{ p.isa_1_caldicott_guard_end | date_format }}</dd>
+                  </div>
+                {% endif %}
+
+                {% if p.agree_66_comp_yn %}
+                  <div class="col-xs-6 col-md-4 col-lg-3">
+                    <dt>AGEM ISA</dt>
+                    <dd>{{ p.agree_66_signed_date_1 | date_format }} - {{ p.agree_66_end_date_2 | date_format }}</dd>
+                  </div>
+                {% endif %}
 
                 <div class="col-sm-3 col-lg-2">
                   <dt>Recruits</dt>
                   <dd>{{ p.recruited_count | separated_number }}</dd>
                 </div>
 
-                <div class="col-sm-3 col-lg-2">
-                  <dt>Last Recruitment</dt>
-                  <dd>{{ p.last_recruited | date_format }}</dd>
-                </div>
+                {% if p.excluded_count > 0 %}
+                  <div class="col-sm-3 col-lg-2">
+                    <dt>Excluded</dt>
+                    <dd>{{ p.excluded_percentage | round(1) }}% ({{ p.excluded_count | separated_number }})</dd>
+                  </div>
+                {% endif %}
+
+                {% if p.withdrawn_count > 0 %}
+                  <div class="col-sm-3 col-lg-2">
+                    <dt>Withdrawn</dt>
+                    <dd>{{ p.withdrawn_percentage | round(1) }}% ({{ p.withdrawn_count | separated_number }})</dd>
+                  </div>
+                {% endif %}
+
+                {% if p.last_recruited %}
+                  <div class="col-sx-4 col-sm-3 col-lg-2">
+                    <dt>Last Recruitment</dt>
+                    <dd>{{ p.last_recruited | date_format }}</dd>
+                  </div>
+                {% endif %}
               </div>
             </dl>
           </li>
