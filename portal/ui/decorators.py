@@ -5,6 +5,19 @@ from portal.models import Practice
 from portal.helpers import redirect_back_url
 
 
+def is_super_user():
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_super:
+                abort(403)
+
+            return f(*args, **kwargs)
+
+        return decorated_function
+    return decorator
+
+
 def assert_practice_user():
     def decorator(f):
         @wraps(f)

@@ -35,11 +35,15 @@
 			{{ login_user_form.remember }} Remember me on this computer
 		</label>
 	</div>
+
+	<p>
+		<a href="{{ url_for_security('forgot_password') }}">Forgotten password?</a>
+	</p>
 		  
 	{{ render_field(login_user_form.next) }}
 
 	<div class="text-right">
-		<a href="{{ url_for_security('forgot_password') }}" class="btn btn-info" role="button">First Login or Forgotten Password</a>
+		<a href="{{ url_for_security('forgot_password') }}" class="btn btn-light" role="button">Register</a>
 		<button type="submit" class="btn btn-primary">Login</button>
 	</div>
 </form>

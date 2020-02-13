@@ -1,9 +1,10 @@
 import csv
 import io
 from flask import render_template, make_response
-from flask_security import login_required, roles_required
+from flask_security import login_required, current_user
 from sqlalchemy import func
 from .. import blueprint
+from ..decorators import is_super_user
 from portal.database import db
 from portal.models import (
     Recruit,
@@ -14,7 +15,7 @@ from portal.models import (
 @blueprint.route('/submissions')
 @blueprint.route('/submissions?page=<int:page>')
 @login_required
-@roles_required('admin')
+@is_super_user()
 def submissions_index(page=1):
     q = db.session.query(
         Recruit.invoice_year,
@@ -24,6 +25,8 @@ def submissions_index(page=1):
         Recruit.invoice_year != ''
     ).filter(
         Recruit.invoice_quarter != ''
+    ).filter(
+        Recruit.practice_code.in_(p.code for p in current_user.all_practices)
     ).group_by(
         Recruit.invoice_year,
         Recruit.invoice_quarter
@@ -31,8 +34,8 @@ def submissions_index(page=1):
 
     submissions = (
         q.order_by(
-            Recruit.invoice_year,
-            Recruit.invoice_quarter
+            Recruit.invoice_year.desc(),
+            Recruit.invoice_quarter.desc()
         ).paginate(
             page=page,
             per_page=10,
@@ -44,7 +47,7 @@ def submissions_index(page=1):
 @blueprint.route('/submissions/<string:invoice_year>/<string:invoice_quarter>')
 @blueprint.route('/submissions/<string:invoice_year>/<string:invoice_quarter>?page=<int:page>')
 @login_required
-@roles_required('admin')
+@is_super_user()
 def submissions_participants(invoice_year, invoice_quarter, page=1):
 
     q = Recruit.query.join(
@@ -53,6 +56,8 @@ def submissions_participants(invoice_year, invoice_quarter, page=1):
         Recruit.invoice_year == invoice_year
     ).filter(
         Recruit.invoice_quarter == invoice_quarter
+    ).filter(
+        Recruit.practice_code.in_(p.code for p in current_user.all_practices)
     )
 
     participants = (
@@ -66,9 +71,10 @@ def submissions_participants(invoice_year, invoice_quarter, page=1):
 
     return render_template('submissions/participants.html', page=page, participants=participants, invoice_year=invoice_year, invoice_quarter=invoice_quarter)
 
+
 @blueprint.route('/submissions/<string:invoice_year>/<string:invoice_quarter>/csv')
 @login_required
-@roles_required('admin')
+@is_super_user()
 def submissions_csv(invoice_year, invoice_quarter):
 
     COL_RECRUITED_DATE = 'Study Entry Date'
@@ -107,6 +113,8 @@ def submissions_csv(invoice_year, invoice_quarter):
         Recruit.invoice_quarter == invoice_quarter
     ).filter(
         Recruit.status != 'Excluded'
+    ).filter(
+        Recruit.practice_code.in_(p.code for p in current_user.all_practices)
     )
 
     participants = q.order_by(

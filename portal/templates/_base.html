@@ -22,7 +22,7 @@
             <a class="nav-link" href="{{ url_for('ui.index') }}">Practices</a>
           </li>
 
-          {% if current_user.is_admin %}
+          {% if current_user.is_super %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('ui.submissions_index') }}">Submissions</a>
             </li>

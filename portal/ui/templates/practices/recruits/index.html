@@ -20,19 +20,16 @@
             <span class="float-right badge badge-info">Invoice: {{ r.invoice_period }}</span>
           {% endif %}
 
-          {% if r.status == "Recruited" %}
-            {% set status_class="badge-success" %}
-          {% elif r.status == "Available for cohort" %}
-            {% set status_class="badge-success" %}
+          {% if r.status == "Recruited" or r.status == "Available for cohort" %}
+            <span class="float-right badge badge-success">{{ r.status }}</span>
           {% elif r.status == "Excluded" %}
-            {% set status_class="badge-danger" %}
+            <span class="float-right badge badge-danger">{{ r.exclusion_text }}</span>
           {% elif r.status == "Withdrawn" %}
-            {% set status_class="badge-warning" %}
+            <span class="float-right badge badge-warning">{{ r.status }}</span>
           {% else %}
-            {% set status_class="badge-secondary" %}
+            <span class="float-right badge badge-secondary">{{ r.status }}</span>
           {% endif %}
           
-          <span class="float-right badge {{ status_class }}">{{ r.status }}</span>
         </h1>
         <h2>Recruited on {{ r.date_recruited | date_format }} and processed on {{ r.processed_date | date_format }}</h2>
       </header>
@@ -61,6 +58,11 @@
   {% endfor %}
   </ul>
 
-{{ formhelper.render_pagination(recruits, 'ui.recruits_index', search=searchForm.search.data, code=practice.code) }}
+{{ formhelper.render_pagination(
+  recruits,
+  'ui.recruits_index',
+  searchForm,
+  code=practice.code,
+  ) }}
 
 {% endblock %}

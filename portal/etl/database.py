@@ -100,6 +100,7 @@ recruit_table = Table(
     Column('invoice_year', Integer),
     Column('invoice_quarter', String(10)),
     Column('reimbursed_status', String(10)),
+    Column('exclusion_reason', String(500)),
 )
 
 

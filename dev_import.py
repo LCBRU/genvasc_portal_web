@@ -67,7 +67,8 @@ def import_recruits():
             date_recruited DATE,
             invoice_year VARCHAR(255),
             invoice_quarter VARCHAR(255),
-            reimbursed_status VARCHAR(255)
+            reimbursed_status VARCHAR(255),
+            exclusion_reason VARCHAR(500)
         );
         """)
 
@@ -98,6 +99,7 @@ def import_recruits():
                 invoice_year=r['invoice_year'],
                 invoice_quarter=r['invoice_quarter'],
                 reimbursed_status=r['reimbursed_status'],
+                exclusion_reason=r['exclusion_reason'],
             ))
 
     db.session.add_all(imports)

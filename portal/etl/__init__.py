@@ -54,6 +54,7 @@ def import_user():
             user.gv_end_del_log = parse_date(u['gv_end_del_log'])
             user.last_update_timestamp = u['last_update_timestamp']
             user.is_imported = True
+            user.active = bool(u['current_portal_user_yn'])
 
             user.practices = set(Practice.query.filter(
                 Practice.code.in_([d['practice_code'] for d in ds])

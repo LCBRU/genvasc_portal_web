@@ -313,6 +313,11 @@ a.fas, a.fas:link, a.fas:hover {
   font-size: 80%;
 }
 
+.search-filters {
+  padding: 10px;
+  background-color: #f1f1f1;
+}
+
 /** SPINNER CREATION **/
 
 .loader {

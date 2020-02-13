@@ -54,6 +54,11 @@
             <dd>{{ d.gv_end_del_log | date_format }}</dd>
           </div>
 
+          <div class="col-sm-3 col-lg-2">
+            <dt>Last Login</dt>
+            <dd>{{ d.user.last_login_at | date_format }}</dd>
+          </div>
+
         </div>
         <div class="row">
 
@@ -75,6 +80,11 @@
   {% endfor %}
   </ul>
 
-{{ formhelper.render_pagination(delegates, 'ui.delegates_index', search=searchForm.search.data, code=practice.code) }}
+{{ formhelper.render_pagination(
+  delegates,
+  'ui.delegates_index',
+  search=searchForm.search.data,
+  code=practice.code
+  ) }}
 
 {% endblock %}

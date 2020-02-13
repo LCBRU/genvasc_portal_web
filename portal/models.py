@@ -1,5 +1,6 @@
 import random
 import string
+import re
 from datetime import datetime
 from itertools import chain
 from portal import db
@@ -158,6 +159,20 @@ class Recruit(db.Model):
     invoice_year = db.Column(db.Integer)
     invoice_quarter = db.Column(db.String(50))
     reimbursed_status = db.Column(db.String(50))
+    exclusion_reason = db.Column(db.String(500))
+
+    @property
+    def exclusion_reason_stripped(self):
+        re_tag = re.compile(r'(<!--.*?-->|<[^>]*>)')
+        re_nbsp = re.compile(r'(&nbsp;)')
+        return re_nbsp.sub('', re_tag.sub('', self.exclusion_reason or '')).strip()
+
+    @property
+    def exclusion_text(self):
+        if len(self.exclusion_reason_stripped) > 0:
+            return f"Excluded: {self.exclusion_reason_stripped}"
+        else:
+            return 'Excluded'
 
     @property
     def full_name(self):
