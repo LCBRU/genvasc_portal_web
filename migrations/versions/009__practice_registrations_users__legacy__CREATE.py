@@ -25,7 +25,7 @@ def upgrade(migrate_engine):
         UniqueConstraint(
             'user_id',
             'practice_registration_id',
-            name='uix_practice_registrations_users__user_id__practice_registration_id'
+            name='uix_pru__user_id__practice_registration_id'
         ),
     )
     t.create()

@@ -111,7 +111,6 @@ def import_recruits():
 def import_delegates():
     db.engine.execute("""
         CREATE TABLE IF NOT EXISTS etl_delegate (
-            id INT AUTO_INCREMENT,
             practice_code VARCHAR(255),
             instance INT,
             name VARCHAR(255),
@@ -162,7 +161,6 @@ def import_delegates():
 def import_practices():
     db.engine.execute("""
         CREATE TABLE IF NOT EXISTS etl_practice_detail (
-            id INT AUTO_INCREMENT,
             project_id INT,
             ccg INT,
             federation INT,
