@@ -65,7 +65,6 @@ def import_user():
     db.session.add_all(users)
     db.session.flush()
     
-    updated = User.query.with_entities(User.id).filter(User.id.in_([u.id for u in users])).subquery()
-    User.query.filter(User.id.notin_(updated), User.is_imported.is_(True)).delete(synchronize_session='fetch')
+    User.query.filter(User.id.notin_([u.id for u in users]), User.is_imported.is_(True)).delete(synchronize_session='fetch')
 
     db.session.commit()
