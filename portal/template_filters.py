@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import get_flashed_messages
 from portal.models import Message
 
@@ -22,10 +22,10 @@ def init_template_filters(app):
 
     @app.template_filter("date_format")
     def date_format(value):
-        if value:
+        if value and (isinstance(value, date) or isinstance(value, datetime)):
             return value.strftime("%-d %b %Y")
         else:
-            return ""
+            return value
 
     @app.template_filter("blank_if_none")
     def blank_if_none(value):

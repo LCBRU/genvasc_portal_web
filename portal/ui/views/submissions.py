@@ -63,7 +63,7 @@ def submissions_participants(invoice_year, invoice_quarter, page=1):
     participants = (
         q.order_by(
             Practice.code,
-            Recruit.date_recruited.asc()
+            Recruit.recruited_date.asc()
         ).paginate(
             page=page,
             per_page=10,
@@ -119,12 +119,12 @@ def submissions_csv(invoice_year, invoice_quarter):
 
     participants = q.order_by(
             Practice.code,
-            Recruit.date_recruited.asc()
+            Recruit.recruited_recruited.asc()
         ).all()
 
     for p in participants:
         output.writerow({
-            COL_RECRUITED_DATE: p.date_recruited,
+            COL_RECRUITED_DATE: p.recruited_date,
             COL_STATUS: p.status,
             COL_PATIENT_ID: p.study_id,
             COL_PRACTICE_CODE: p.practice.code,

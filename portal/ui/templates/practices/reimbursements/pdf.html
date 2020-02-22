@@ -107,7 +107,7 @@
 		<tbody>
 			{% for p in participants %}
 				<tr>
-					<td>{{ p.date_recruited | date_format }}</td>
+					<td>{{ p.recruited_date | date_format }}</td>
 					<td>{{ p.status }}</td>
 					<td>{{ p.full_name }}</td>
 					<td>{{ p.study_id }}</td>

@@ -89,7 +89,7 @@ def recruits_index(code):
             ))
 
     recruits = (
-        q.order_by(Recruit.date_recruited.desc())
+        q.order_by(Recruit.recruited_date.desc())
          .paginate(
             page=search_form.page.data,
             per_page=10,
@@ -152,7 +152,7 @@ def reimbursements_participants(code, invoice_year, invoice_quarter, page=1):
     )
 
     participants = (
-        q.order_by(Recruit.date_recruited.asc())
+        q.order_by(Recruit.recruited_date.asc())
          .paginate(
             page=page,
             per_page=10,
@@ -176,7 +176,7 @@ def reimbursements_pdf(code, invoice_year, invoice_quarter):
         Recruit.invoice_quarter == invoice_quarter
     )
 
-    participants = q.order_by(Recruit.date_recruited.asc()).all()
+    participants = q.order_by(Recruit.recruited_date.asc()).all()
 
     totals = {
         'count': len(participants),

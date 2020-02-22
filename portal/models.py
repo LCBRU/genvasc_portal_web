@@ -7,6 +7,7 @@ from portal import db
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import ForeignKeyConstraint, select, func
 from sqlalchemy.orm import column_property
+from portal.utils import parse_date
 
 
 roles_users = db.Table(
@@ -154,7 +155,7 @@ class Recruit(db.Model):
     civicrm_contact_id = db.Column(db.Integer)
     civicrm_case_id = db.Column(db.Integer, primary_key=True)
     processed_date = db.Column(db.Date)
-    date_recruited = db.Column(db.Date, nullable=False)
+    recruited_date = db.Column(db.Date, nullable=False)
     invoice_year = db.Column(db.Integer)
     invoice_quarter = db.Column(db.String(50))
     reimbursed_status = db.Column(db.String(50))
@@ -202,13 +203,13 @@ class Practice(db.Model):
     postcode = db.Column(db.String, nullable=True)
     partners = db.Column(db.String, nullable=True)
     collab_ag_comp_yn = db.Column(db.Boolean, nullable=True)
-    collab_ag_signed_date = db.Column(db.Date, nullable=True)
+    collab_ag_signed_date_str = db.Column(db.Date, nullable=True)
     isa_comp_yn = db.Column(db.Boolean, nullable=True)
-    isa_1_signed_date = db.Column(db.Date, nullable=True)
-    isa_1_caldicott_guard_end = db.Column(db.Date, nullable=True)
+    isa_1_signed_date_str = db.Column(db.Date, nullable=True)
+    isa_1_caldicott_guard_end_str = db.Column(db.Date, nullable=True)
     agree_66_comp_yn = db.Column(db.Boolean, nullable=True)
-    agree_66_signed_date_1 = db.Column(db.Date, nullable=True)
-    agree_66_end_date_2 = db.Column(db.Date, nullable=True)
+    agree_66_signed_date_1_str = db.Column(db.Date, nullable=True)
+    agree_66_end_date_2_str = db.Column(db.Date, nullable=True)
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
     status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.id), nullable=True)
     status = db.relationship(PracticeStatus)
@@ -217,7 +218,27 @@ class Practice(db.Model):
     recruited_count = column_property(select([func.count()]).where(Recruit.practice_code==code))
     withdrawn_count = column_property(select([func.count()]).where(Recruit.practice_code==code).where(Recruit.status=='Withdrawn'))
     excluded_count = column_property(select([func.count()]).where(Recruit.practice_code==code).where(Recruit.status=='Excluded'))
-    last_recruited = column_property(select([func.max(Recruit.date_recruited)]).where(Recruit.practice_code==code))
+    last_recruited = column_property(select([func.max(Recruit.recruited_date)]).where(Recruit.practice_code==code))
+
+    @property
+    def collab_ag_signed_date(self):
+        return parse_date(self.collab_ag_signed_date_str)
+
+    @property
+    def isa_1_signed_date(self):
+        return parse_date(self.isa_1_signed_date_str)
+
+    @property
+    def isa_1_caldicott_guard_end(self):
+        return parse_date(self.isa_1_caldicott_guard_end_str).date()
+
+    @property
+    def agree_66_signed_date_1(self):
+        return parse_date(self.agree_66_signed_date_1_str)
+
+    @property
+    def agree_66_end_date_2(self):
+        return parse_date(self.agree_66_end_date_2_str)
 
     @property
     def excluded_percentage(self):

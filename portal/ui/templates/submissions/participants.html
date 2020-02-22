@@ -24,7 +24,7 @@
 			<tbody>
 				{% for p in participants.items %}
 					<tr>
-						<td>{{ p.date_recruited | date_format }}</td>
+						<td>{{ p.recruited_date | date_format }}</td>
 						<td>{{ p.status }}</td>
 						<td>{{ p.study_id }}</td>
 						<td>{{ p.practice.code }}</td>
