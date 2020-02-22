@@ -77,30 +77,32 @@
                   </div>
                 {% endif %}
 
-                <div class="col-sm-3 col-lg-2">
-                  <dt>Recruits</dt>
-                  <dd>{{ p.recruited_count | separated_number }}</dd>
-                </div>
-
-                {% if p.excluded_count > 0 %}
+                {% if p.recruit_summary %}
                   <div class="col-sm-3 col-lg-2">
-                    <dt>Excluded</dt>
-                    <dd>{{ p.excluded_percentage | round(1) }}% ({{ p.excluded_count | separated_number }})</dd>
+                    <dt>Recruits</dt>
+                    <dd>{{ p.recruit_summary.recruited }}</dd>
                   </div>
-                {% endif %}
 
-                {% if p.withdrawn_count > 0 %}
-                  <div class="col-sm-3 col-lg-2">
-                    <dt>Withdrawn</dt>
-                    <dd>{{ p.withdrawn_percentage | round(1) }}% ({{ p.withdrawn_count | separated_number }})</dd>
-                  </div>
-                {% endif %}
+                  {% if p.recruit_summary.excluded > 0 %}
+                    <div class="col-sm-3 col-lg-2">
+                      <dt>Excluded</dt>
+                      <dd>{{ p.recruit_summary.excluded_percentage | round(1) }}% ({{ p.recruit_summary.excluded }})</dd>
+                    </div>
+                  {% endif %}
 
-                {% if p.last_recruited %}
-                  <div class="col-sx-4 col-sm-3 col-lg-2">
-                    <dt>Last Recruitment</dt>
-                    <dd>{{ p.last_recruited | date_format }}</dd>
-                  </div>
+                  {% if p.recruit_summary.withdrawn > 0 %}
+                    <div class="col-sm-3 col-lg-2">
+                      <dt>Withdrawn</dt>
+                      <dd>{{ p.recruit_summary.withdrawn_percentage | round(1) }}% ({{ p.recruit_summary.withdrawn }})</dd>
+                    </div>
+                  {% endif %}
+
+                  {% if p.recruit_summary.last_recruited_date %}
+                    <div class="col-sx-4 col-sm-3 col-lg-2">
+                      <dt>Last Recruitment</dt>
+                      <dd>{{ p.recruit_summary.last_recruited_date | date_format }}</dd>
+                    </div>
+                  {% endif %}
                 {% endif %}
               </div>
             </dl>

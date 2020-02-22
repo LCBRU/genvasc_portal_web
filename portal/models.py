@@ -136,9 +136,10 @@ class ManagementArea(PracticeGroup):
 
 class PracticeStatus(db.Model):
 
-    __tablename__ = 'etl_practice_status'
+    __tablename__ = 'practice_status'
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
+    value = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String, nullable=False)
 
 
@@ -211,14 +212,10 @@ class Practice(db.Model):
     agree_66_signed_date_1_str = db.Column(db.Date, nullable=True)
     agree_66_end_date_2_str = db.Column(db.Date, nullable=True)
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
-    status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.id), nullable=True)
+    status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.value), nullable=True)
     status = db.relationship(PracticeStatus)
     recruits = db.relationship(Recruit, backref='practice', lazy=True)
-
-    recruited_count = column_property(select([func.count()]).where(Recruit.practice_code==code))
-    withdrawn_count = column_property(select([func.count()]).where(Recruit.practice_code==code).where(Recruit.status=='Withdrawn'))
-    excluded_count = column_property(select([func.count()]).where(Recruit.practice_code==code).where(Recruit.status=='Excluded'))
-    last_recruited = column_property(select([func.max(Recruit.recruited_date)]).where(Recruit.practice_code==code))
+    recruit_summary = db.relationship("RecruitSummary", uselist=False, back_populates="practice", lazy='joined')
 
     @property
     def collab_ag_signed_date(self):
@@ -239,20 +236,6 @@ class Practice(db.Model):
     @property
     def agree_66_end_date_2(self):
         return parse_date(self.agree_66_end_date_2_str)
-
-    @property
-    def excluded_percentage(self):
-        if self.recruited_count > 0:
-            return self.excluded_count / self.recruited_count * 100
-        else:
-            return 0
-
-    @property
-    def withdrawn_percentage(self):
-        if self.recruited_count > 0:
-            return self.withdrawn_count / self.recruited_count * 100
-        else:
-            return 0
 
     @property
     def ccg_name(self):
@@ -280,6 +263,32 @@ class Practice(db.Model):
             return True
 
         return False
+
+
+class RecruitSummary(db.Model):
+
+    __tablename__ = 'etl_recruit_summary'
+
+    practice_code = db.Column(db.String(500), db.ForeignKey(Practice.code), primary_key=True, nullable=True)
+    practice = db.relationship("Practice", back_populates="recruit_summary")
+    recruited = db.Column(db.Integer)
+    excluded = db.Column(db.Integer)
+    withdrawn = db.Column(db.Integer)
+    last_recruited_date = db.Column(db.Date)
+
+    @property
+    def excluded_percentage(self):
+        if self.recruited > 0:
+            return self.excluded / self.recruited * 100
+        else:
+            return 0
+
+    @property
+    def withdrawn_percentage(self):
+        if self.recruited > 0:
+            return self.withdrawn / self.recruited * 100
+        else:
+            return 0
 
 
 class Role(db.Model, RoleMixin):
