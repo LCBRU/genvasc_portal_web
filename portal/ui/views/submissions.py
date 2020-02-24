@@ -25,9 +25,14 @@ def submissions_index(page=1):
         Recruit.invoice_year != ''
     ).filter(
         Recruit.invoice_quarter != ''
-    ).filter(
-        Recruit.practice_code.in_(p.code for p in current_user.all_practices)
-    ).group_by(
+    )
+    
+    if not current_user.is_admin:
+        q = q.filter(
+            Recruit.practice_code.in_(p.code for p in current_user.all_practices)
+        )
+    
+    q = q.group_by(
         Recruit.invoice_year,
         Recruit.invoice_quarter
     )
