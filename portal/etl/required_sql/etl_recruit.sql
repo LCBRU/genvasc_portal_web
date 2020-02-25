@@ -9,9 +9,6 @@ select
     con.birth_date AS date_of_birth,
     con.id AS civicrm_contact_id,
     cas.id AS civicrm_case_id,
-    rel_c.display_name AS processed_by,
-    coalesce(rel_r.start_date,
-    cas.start_date) AS processed_date,
     cas.start_date AS recruited_date,
     inv.invoice_year_107 AS invoice_year,
     inv.invoice_quarter_108 AS invoice_quarter,
@@ -57,14 +54,6 @@ join civicrmlive_docker4716.civicrm_value_gp_surgery_data_3 gpCustom
 	on gpCustom.entity_id = cas_prac.practice_id
 left join civicrmlive_docker4716.civicrm_value_genvasc_recruitment_data_5 gen
 	on gen.entity_id = cas.id
-left join civicrmlive_docker4716.civicrm_relationship rel_r
-	on rel_r.case_id = cas.id
-    and rel_r.relationship_type_id = 21
-    and rel_r.is_active = 1
-    and (isnull(rel_r.end_date) or rel_r.end_date >= curdate())
-    and (isnull(rel_r.start_date) or rel_r.start_date <= curdate())
-left join civicrmlive_docker4716.civicrm_contact rel_c
-	on rel_c.id = rel_r.contact_id_b
 left join civicrmlive_docker4716.civicrm_value_genvasc_invoice_data_25 inv
 	on inv.entity_id = cas.id
 where

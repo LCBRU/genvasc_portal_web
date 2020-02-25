@@ -155,7 +155,6 @@ class Recruit(db.Model):
     date_of_birth = db.Column(db.Date, nullable=False)
     civicrm_contact_id = db.Column(db.Integer)
     civicrm_case_id = db.Column(db.Integer, primary_key=True)
-    processed_date = db.Column(db.Date)
     recruited_date = db.Column(db.Date, nullable=False)
     invoice_year = db.Column(db.Integer)
     invoice_quarter = db.Column(db.String(50))

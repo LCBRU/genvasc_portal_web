@@ -102,8 +102,6 @@ recruit_table = Table(
     Column('date_of_birth', Date),
     Column('civicrm_contact_id', Integer),
     Column('civicrm_case_id', Integer),
-    Column('processed_by', String(100)),
-    Column('processed_date', Date),
     Column('recruited_date', Date),
     Column('invoice_year', Integer),
     Column('invoice_quarter', String(10)),
