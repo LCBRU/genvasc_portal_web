@@ -23,6 +23,25 @@ class SearchForm(FlashingForm):
     page = IntegerField('Page', default=1)
 
 
+class PracticeSearchForm(SearchForm):
+    collabortaion_signed = SelectField('Collaboration Signed', choices=[('', ''), ('true', 'Yes'), ('false', 'No')])
+    has_current_isa = SelectField('Has Current ISA', choices=[('', ''), ('true', 'Yes'), ('false', 'No')])
+    genvasc_initiated = SelectField('GENVASC Initiated', choices=[('', ''), ('true', 'Yes'), ('false', 'No')])
+    status = SelectField('Status', choices=[])
+    sort_by = SelectField('Sort By', choices=[
+        ('name', 'Name'),
+        ('code', 'Code'),
+        ('recruits_desc', 'Most Recruits'),
+        ('recruits_asc', 'Least Recruits'),
+        ('excluded_desc', 'Highest % Excluded'),
+        ('excluded_asc', 'Lowest % Excluded'),
+        ('withdrawn_desc', 'Highest % Withdrawn'),
+        ('withdrawn_asc', 'Lowest % Withdrawn'),
+        ('last_recruited_asc', 'Last Recruitment (ascending)'),
+        ('last_recruited_desc', 'Last Recruitment (descending)'),
+    ])
+
+
 class DelegateSearchForm(SearchForm):
     end_date_exists = SelectField('Has End Date', choices=[('', ''), ('true', 'Yes'), ('false', 'No')])
     has_logged_on = SelectField('Has Logged On', choices=[('', ''), ('true', 'Yes'), ('false', 'No')])

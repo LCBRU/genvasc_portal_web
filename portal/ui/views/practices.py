@@ -2,46 +2,101 @@ import datetime
 from flask import render_template, request, redirect, url_for
 from flask_security import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, and_, not_
 from portal.database import db
 from portal.models import (
     Delegate,
     Practice,
     Recruit,
     User,
+    PracticeStatus,
+    RecruitSummary,
 )
 from .. import blueprint
-from ..forms import SearchForm, DelegateSearchForm, RecruitSearchForm
+from ..forms import DelegateSearchForm, RecruitSearchForm, PracticeSearchForm
 from ..decorators import assert_practice_user, must_exist
 
 
 @blueprint.route('/practices/')
 @login_required
 def practices_index():
-    searchForm = SearchForm(formdata=request.args)
+    search_form = PracticeSearchForm(formdata=request.args)
+
+    search_form.status.choices = [('', '')] + [(s.id, s.name) for s in PracticeStatus.query.order_by(PracticeStatus.name.asc()).all()]
 
     q = Practice.query
 
-    if (not current_user.is_admin):
+    if not current_user.is_admin:
         q = q.filter(Practice.code.in_(p.code for p in current_user.all_practices))
 
-    if searchForm.search.data:
+    q = filter_boolean_by_truefalsenone(q, search_form.collabortaion_signed, Practice.collab_ag_comp_yn)
+    q = filter_boolean_by_truefalsenone(q, search_form.genvasc_initiated, Practice.genvasc_initiated)
+
+    if search_form.has_current_isa.data.casefold() == 'true':
+        q = q.filter(or_(
+            and_(Practice.isa_comp_yn == True, Practice.isa_1_caldicott_guard_end_str == None).self_group(),
+            and_(Practice.isa_comp_yn == True, Practice.isa_1_caldicott_guard_end_str >= datetime.datetime.utcnow().strftime('%Y-%m-%d')).self_group(),
+            and_(Practice.agree_66_comp_yn == True, Practice.agree_66_end_date_2_str == None).self_group(),
+            and_(Practice.agree_66_comp_yn == True, Practice.agree_66_end_date_2_str >= datetime.datetime.utcnow().strftime('%Y-%m-%d')).self_group(),
+        ))
+    elif search_form.has_current_isa.data.casefold() == 'false':
+        q = q.filter(and_(
+            or_(
+                Practice.isa_comp_yn == None,
+                Practice.isa_comp_yn == False,
+                and_(Practice.isa_comp_yn == True, Practice.isa_1_caldicott_guard_end_str < datetime.datetime.utcnow().strftime('%Y-%m-%d')).self_group(),
+            ).self_group(),
+            or_(
+                Practice.agree_66_comp_yn == None,
+                Practice.agree_66_comp_yn == False,
+                and_(Practice.agree_66_comp_yn == True, Practice.agree_66_end_date_2_str < datetime.datetime.utcnow().strftime('%Y-%m-%d')).self_group(),
+            ).self_group(),
+        ))
+
+    if search_form.status.data.isdigit():
+        q = q.join(
+            PracticeStatus
+        ).filter(
+            PracticeStatus.id == search_form.status.data
+        )
+
+    if search_form.search.data:
         q = q.filter(
             or_(
-                Practice.name.like("%{}%".format(searchForm.search.data)),
-                Practice.street_address.like("%{}%".format(searchForm.search.data)),
-                Practice.town.like("%{}%".format(searchForm.search.data)),
-                Practice.city.like("%{}%".format(searchForm.search.data)),
-                Practice.county.like("%{}%".format(searchForm.search.data)),
-                Practice.postcode.like("%{}%".format(searchForm.search.data)),
-                Practice.partners.like("%{}%".format(searchForm.search.data)),
-                Practice.code == searchForm.search.data),
+                Practice.name.like("%{}%".format(search_form.search.data)),
+                Practice.street_address.like("%{}%".format(search_form.search.data)),
+                Practice.town.like("%{}%".format(search_form.search.data)),
+                Practice.city.like("%{}%".format(search_form.search.data)),
+                Practice.county.like("%{}%".format(search_form.search.data)),
+                Practice.postcode.like("%{}%".format(search_form.search.data)),
+                Practice.partners.like("%{}%".format(search_form.search.data)),
+                Practice.code == search_form.search.data),
             )
 
+    if search_form.sort_by.data == 'code':
+        q = q.order_by(Practice.code.asc())
+    elif search_form.sort_by.data == 'recruits_desc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.recruited.desc())
+    elif search_form.sort_by.data == 'recruits_asc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.recruited.asc())
+    elif search_form.sort_by.data == 'excluded_desc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.excluded_percentage.desc())
+    elif search_form.sort_by.data == 'excluded_asc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.excluded_percentage.asc())
+    elif search_form.sort_by.data == 'withdrawn_desc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.withdrawn_percentage.desc())
+    elif search_form.sort_by.data == 'withdrawn_asc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.withdrawn_percentage.asc())
+    elif search_form.sort_by.data == 'last_recruited_desc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.last_recruited_date.desc())
+    elif search_form.sort_by.data == 'last_recruited_asc':
+        q = q.join(RecruitSummary).order_by(RecruitSummary.last_recruited_date.asc())
+    else:
+        q = q.order_by(Practice.name.asc())
+
     practices = (
-        q.order_by(Practice.name.asc())
-         .paginate(
-            page=searchForm.page.data,
+        q.paginate(
+            page=search_form.page.data,
             per_page=10,
             error_out=False))
 
@@ -53,7 +108,7 @@ def practices_index():
     return render_template(
         'practices/index.html',
         practices=practices,
-        searchForm=searchForm,
+        searchForm=search_form,
     )
 
 
@@ -280,6 +335,6 @@ def filter_boolean_by_truefalsenone(query, form_field, model_field):
     if form_field.data.casefold() == 'true':
         return query.filter(model_field == True)
     elif form_field.data.casefold() == 'false':
-        return query.filter(model_field == False or model_field == None)
+        return query.filter(or_(model_field == False, model_field == None).self_group())
     else:
         return query

@@ -11,15 +11,15 @@ ALTER VIEW etl_practice_detail AS
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'postcode' THEN rd.value ELSE NULL END) AS postcode,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'federation' THEN rd.value ELSE NULL END) AS federation,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'partners' THEN rd.value ELSE NULL END) AS partners,
-		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'collab_ag_comp_yn' THEN rd.value ELSE NULL END) AS collab_ag_comp_yn,
+		CASE WHEN GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'collab_ag_comp_yn' THEN rd.value ELSE NULL END) = '1' THEN True ELSE False END AS collab_ag_comp_yn,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'collab_ag_signed_date' THEN rd.value ELSE NULL END) AS collab_ag_signed_date_str,
-		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'isa_comp_yn' THEN rd.value ELSE NULL END) AS isa_comp_yn,
+		CASE WHEN GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'isa_comp_yn' THEN rd.value = '1' ELSE NULL END) = '1' THEN True ELSE False END AS isa_comp_yn,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'isa_1_signed_date' THEN rd.value ELSE NULL END) AS isa_1_signed_date_str,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'isa_1_caldicott_guard_end' THEN rd.value ELSE NULL END) AS isa_1_caldicott_guard_end_str,
-		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'agree_66_comp_yn' THEN rd.value ELSE NULL END) AS agree_66_comp_yn,
+		CASE WHEN GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'agree_66_comp_yn' THEN rd.value ELSE NULL END) = '1' THEN True ELSE False END AS agree_66_comp_yn,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'agree_66_signed_date_1' THEN rd.value ELSE NULL END) AS agree_66_signed_date_1_str,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'agree_66_end_date_2' THEN rd.value ELSE NULL END) AS agree_66_end_date_2_str,
-		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'genvasc_initiated' THEN rd.value ELSE NULL END) AS genvasc_initiated,
+		CASE WHEN GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'genvasc_initiated' THEN rd.value ELSE NULL END) = '1' THEN True ELSE False END AS genvasc_initiated,
 		GROUP_CONCAT(DISTINCT CASE WHEN rd.field_name = 'status' THEN rd.value ELSE NULL END) AS status_id
 	FROM redcap6170_briccsext.redcap_data rd
 	WHERE

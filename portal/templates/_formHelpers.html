@@ -94,8 +94,8 @@
     <div class="search-filters">
       <div class="row">
         {% for field in searchForm | rejectattr("type", "ne", "SelectField") %}
-          <div class="form-group{% if field.errors %} has-error{%endif%} col-6 col-sm-4 col-md-3 col-xl-2">
-            <div>{{ field.label.text }}</div>
+          <div class="form-group{% if field.errors %} has-error{%endif%} col">
+            <div>{{ field.label.text | nbsp}}</div>
             <div>{{ field(**kwargs)|safe }}</div>
           </div>
         {% endfor %}
@@ -111,7 +111,7 @@
   {% if pagination.pages > 1 %}
 
   {% for f in form | rejectattr("name", "eq", "page") | rejectattr("name", "eq", "csrf_token") | selectattr("data") %}
-    {{ kwargs.update({f.name: f.data}) }}
+    {% if kwargs.update({f.name: f.data}) %} {% endif %}
   {% endfor %}
 
   <ul class="pagination">

@@ -20,8 +20,17 @@ def init_template_filters(app):
         else:
             return ""
 
+    @app.template_filter("nbsp")
+    def nbsp(value):
+        if value:
+            return value.replace(' ', '\xa0')
+        else:
+            return ""
+
     @app.template_filter("date_format")
     def date_format(value):
+        if value is None:
+            return ''
         if value and (isinstance(value, date) or isinstance(value, datetime)):
             return value.strftime("%-d %b %Y")
         else:

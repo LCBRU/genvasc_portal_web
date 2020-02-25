@@ -219,23 +219,28 @@ class Practice(db.Model):
 
     @property
     def collab_ag_signed_date(self):
-        return parse_date(self.collab_ag_signed_date_str)
+        if self.collab_ag_signed_date_str:
+            return parse_date(self.collab_ag_signed_date_str).date()
 
     @property
     def isa_1_signed_date(self):
-        return parse_date(self.isa_1_signed_date_str)
+        if self.isa_1_signed_date_str:
+            return parse_date(self.isa_1_signed_date_str).date()
 
     @property
     def isa_1_caldicott_guard_end(self):
-        return parse_date(self.isa_1_caldicott_guard_end_str).date()
+        if self.isa_1_caldicott_guard_end_str:
+            return parse_date(self.isa_1_caldicott_guard_end_str).date()
 
     @property
     def agree_66_signed_date_1(self):
-        return parse_date(self.agree_66_signed_date_1_str)
+        if self.agree_66_signed_date_1_str:
+            return parse_date(self.agree_66_signed_date_1_str).date()
 
     @property
     def agree_66_end_date_2(self):
-        return parse_date(self.agree_66_end_date_2_str)
+        if self.agree_66_end_date_2_str:
+            return parse_date(self.agree_66_end_date_2_str).date()
 
     @property
     def ccg_name(self):
@@ -257,9 +262,12 @@ class Practice(db.Model):
 
     @property
     def has_current_isa(self):
-        if self.isa_comp_yn and (self.isa_1_caldicott_guard_end or datetime.date.today()) >= datetime.date.today():
-            return True
-        elif self.agree_66_comp_yn and (self.agree_66_end_date_2 or datetime.date.today()) >= datetime.date.today():
+        if (
+            (self.isa_comp_yn and self.isa_1_caldicott_guard_end is None) or
+            (self.isa_comp_yn and self.isa_1_caldicott_guard_end > datetime.date.today()) or
+            (self.agree_66_comp_yn and self.agree_66_end_date_2 is None) or
+            (self.agree_66_comp_yn and self.agree_66_end_date_2 > datetime.date.today())
+        ):
             return True
 
         return False
@@ -273,22 +281,10 @@ class RecruitSummary(db.Model):
     practice = db.relationship("Practice", back_populates="recruit_summary")
     recruited = db.Column(db.Integer)
     excluded = db.Column(db.Integer)
+    excluded_percentage = db.Column(db.Float)
     withdrawn = db.Column(db.Integer)
+    withdrawn_percentage = db.Column(db.Float)
     last_recruited_date = db.Column(db.Date)
-
-    @property
-    def excluded_percentage(self):
-        if self.recruited > 0:
-            return self.excluded / self.recruited * 100
-        else:
-            return 0
-
-    @property
-    def withdrawn_percentage(self):
-        if self.recruited > 0:
-            return self.withdrawn / self.recruited * 100
-        else:
-            return 0
 
 
 class Role(db.Model, RoleMixin):
