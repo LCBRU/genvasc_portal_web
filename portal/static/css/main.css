@@ -266,7 +266,7 @@ dd {
 }
 
 .login-form .card-body .description {
-  flex: 1;
+  flex: 1 0 auto;
   padding: 0 20px;
   font-weight: bold;
   width: 350px;
