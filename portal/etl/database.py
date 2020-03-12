@@ -1,6 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean, Date, DateTime
+from sqlalchemy import (
+    MetaData,
+    Table,
+    Column,
+    Integer,
+    String,
+    Boolean,
+    Date,
+    DateTime,
+    DECIMAL,
+)
 from contextlib import contextmanager
 from flask import current_app
 
@@ -30,16 +40,16 @@ practice_table = Table(
     Column('postcode', String(20)),
     Column('federation', Integer),
     Column('partners', String(100)),
+    Column('collab_ag_comp_yn', Boolean),
+    Column('collab_ag_signed_date_str', String(100)),
+    Column('isa_comp_yn', Boolean),
+    Column('isa_1_signed_date_str', String(100)),
+    Column('isa_1_caldicott_guard_end_str', String(100)),
+    Column('agree_66_comp_yn', Boolean),
+    Column('agree_66_signed_date_1_str', String(100)),
+    Column('agree_66_end_date_2_str', String(100)),
     Column('genvasc_initiated', Integer),
     Column('status_id', Integer),
-    Column('collab_ag_comp_yn', Boolean),
-    Column('collab_ag_signed_date', Date),
-    Column('isa_comp_yn', Boolean),
-    Column('isa_1_signed_date', Date),
-    Column('isa_1_caldicott_guard_end', Date),
-    Column('agree_66_comp_yn', Boolean),
-    Column('agree_66_signed_date_1', Date),
-    Column('agree_66_end_date_2', Date),
 )
 
 
@@ -107,6 +117,18 @@ recruit_table = Table(
     Column('invoice_quarter', String(10)),
     Column('reimbursed_status', String(10)),
     Column('exclusion_reason', String(500)),
+)
+
+
+recruit_summary_table = Table(
+    'etl_recruit_summary', recruit_etl_meta,
+    Column('practice_code', String(100)),
+    Column('recruited', Integer),
+    Column('excluded', Integer),
+    Column('withdrawn', Integer),
+    Column('last_recruited_date', Date),
+    Column('excluded_percentage', DECIMAL),
+    Column('withdrawn_percentage', DECIMAL),
 )
 
 

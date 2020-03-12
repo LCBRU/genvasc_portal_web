@@ -7,6 +7,7 @@ from portal.database import db
 from portal.etl.database import (
     etl_import_database,
     recruit_table,
+    recruit_summary_table,
     delegate_table,
     practice_table,
     practice_group_table,
@@ -15,6 +16,7 @@ from portal.etl.database import (
 )
 from portal.models import (
     Recruit,
+    RecruitSummary,
     Delegate,
     Practice,
     PracticeGroup,
@@ -105,6 +107,43 @@ def import_recruits():
     db.session.commit()
 
 
+def import_recruit_summary():
+    db.engine.execute("""
+        CREATE TABLE IF NOT EXISTS etl_recruit_summary (
+            practice_code VARCHAR(100),
+            recruited INTEGER,
+            excluded INTEGER,
+            withdrawn INTEGER,
+            last_recruited_date DATE,
+            excluded_percentage DECIMAL(30, 4),
+            withdrawn_percentage DECIMAL(30, 4)
+        );
+        """)
+
+    db.engine.execute("""
+        CREATE INDEX idx__etl_recruit_summary__practice_code ON etl_recruit_summary(practice_code);
+        """)
+
+    imports = []
+
+    with etl_import_database() as r_db:
+        for r in r_db.execute(recruit_summary_table.select()):
+            imports.append(RecruitSummary(
+                practice_code=r['practice_code'],
+                recruited=r['recruited'],
+                excluded=int(r['excluded']),
+                withdrawn=int(r['withdrawn']),
+                last_recruited_date=r['last_recruited_date'],
+                excluded_percentage=r['excluded_percentage'],
+                withdrawn_percentage=r['withdrawn_percentage'],
+            ))
+
+    db.session.add_all(imports)
+    db.session.flush()
+
+    db.session.commit()
+
+
 def import_delegates():
     db.engine.execute("""
         CREATE TABLE IF NOT EXISTS etl_delegate (
@@ -170,13 +209,13 @@ def import_practices():
             postcode VARCHAR(255),
             partners VARCHAR(255),
             collab_ag_comp_yn BIT,
-            collab_ag_signed_date DATE,
+            collab_ag_signed_date_str VARCHAR(100),
             isa_comp_yn BIT,
-            isa_1_signed_date DATE,
-            isa_1_caldicott_guard_end DATE,
+            isa_1_signed_date_str VARCHAR(255),
+            isa_1_caldicott_guard_end_str VARCHAR(255),
             agree_66_comp_yn BIT,
-            agree_66_signed_date_1 DATE,
-            agree_66_end_date_2 DATE,
+            agree_66_signed_date_1_str VARCHAR(255),
+            agree_66_end_date_2_str VARCHAR(255),
             genvasc_initiated BIT,
             status_id INT NULL
         );
@@ -209,13 +248,13 @@ def import_practices():
                 federation=r['federation'],
                 partners=r['partners'],
                 collab_ag_comp_yn=r['collab_ag_comp_yn'],
-                collab_ag_signed_date=parse_date(r['collab_ag_signed_date']),
+                collab_ag_signed_date_str=parse_date(r['collab_ag_signed_date_str']),
                 isa_comp_yn=r['isa_comp_yn'],
-                isa_1_signed_date=parse_date(r['isa_1_signed_date']),
-                isa_1_caldicott_guard_end=parse_date(r['isa_1_caldicott_guard_end']),
+                isa_1_signed_date_str=parse_date(r['isa_1_signed_date_str']),
+                isa_1_caldicott_guard_end_str=parse_date(r['isa_1_caldicott_guard_end_str']),
                 agree_66_comp_yn=r['agree_66_comp_yn'],
-                agree_66_signed_date_1=parse_date(r['agree_66_signed_date_1']),
-                agree_66_end_date_2=parse_date(r['agree_66_end_date_2']),
+                agree_66_signed_date_1_str=parse_date(r['agree_66_signed_date_1_str']),
+                agree_66_end_date_2_str=parse_date(r['agree_66_end_date_2_str']),
                 genvasc_initiated=r['genvasc_initiated'] in ('1', 1),
                 status_id=r['status_id'],
             ))
@@ -300,6 +339,7 @@ import_practice_status()
 import_practice_groups()
 import_practices()
 import_recruits()
+import_recruit_summary()
 import_delegates()
 import_practice_groups_practices()
 

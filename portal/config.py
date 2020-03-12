@@ -7,6 +7,8 @@ load_dotenv()
 
 
 class BaseConfig(object):
+    REMEMBER_COOKIE_NAME = 'GENVASC Remember Me'
+    REMEMBER_COOKIE_DURATION = 1
     MAIL_SERVER = os.environ['MAIL_SERVER']
     MAIL_DEBUG =  os.environ['MAIL_DEBUG']
     SECURITY_EMAIL_SENDER = os.environ['LCBRUIT_EMAIL_ADDRESS']
