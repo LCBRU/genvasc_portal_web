@@ -18,10 +18,7 @@ from .models import User, Role
 from .database import db
 
 
-
 SYSTEM_USER_EMAIL = 'system@genvasc.nhs.uk'
-
-login_manager = LoginManager()
 
 
 class PasswordPolicy(ValidatorMixin):
@@ -85,17 +82,20 @@ class ChangePasswordForm(Form, PasswordFormMixin):
         return True
 
 
-def init_security(app):
-    login_manager.init_app(app)
-    login_manager.login_view = "security_ui.login"
+def load_user(email):
+    return User.query.filter_by(email=email).one_or_none()
 
+def init_security(app):
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    Security(
+    security = Security(
         app,
         user_datastore,
         reset_password_form=ResetPasswordForm,
         change_password_form=ChangePasswordForm,
+
     )
+
+    security.login_manager.user_loader(load_user)
 
     @app.before_request
     def get_current_user():

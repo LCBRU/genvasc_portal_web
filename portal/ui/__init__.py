@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask_login import login_required, fresh_login_required
+from flask_login import login_required
 from ..database import db
 
 
@@ -8,7 +8,6 @@ blueprint = Blueprint("ui", __name__, template_folder="templates")
 # Login required for all views
 @blueprint.before_request
 @login_required
-@fresh_login_required
 def before_request():
     pass
 

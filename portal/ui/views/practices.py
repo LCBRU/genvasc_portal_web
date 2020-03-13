@@ -18,7 +18,6 @@ from ..decorators import assert_practice_user, must_exist
 
 
 @blueprint.route('/practices/')
-@login_required
 def practices_index():
     search_form = PracticeSearchForm(formdata=request.args)
 

@@ -334,6 +334,9 @@ class User(db.Model, UserMixin):
     )
     last_update_timestamp = db.Column(db.Integer, nullable=True)
 
+    def get_id(self):
+        return self.email
+        
     @property
     def is_super(self):
         return self.is_admin or len(self.practice_groups) > 0
