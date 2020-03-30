@@ -244,11 +244,11 @@ class Practice(db.Model):
     @property
     def ccg_name(self):
         return {
-            0 : 'NHS Leicester City CCG',
-            1 : 'NHS East Leicestershire and Rutland CCG',
-            2 : 'NHS West Leicestershire CCG',
-            3 : 'Corby',
-            4 : 'Nene',
+            '0' : 'NHS Leicester City CCG',
+            '1' : 'NHS East Leicestershire and Rutland CCG',
+            '2' : 'NHS West Leicestershire CCG',
+            '3' : 'Corby',
+            '4' : 'Nene',
         }[self.ccg]
 
     @property
