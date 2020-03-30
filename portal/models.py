@@ -243,13 +243,15 @@ class Practice(db.Model):
 
     @property
     def ccg_name(self):
-        return {
+        ccgs = {
             '0' : 'NHS Leicester City CCG',
             '1' : 'NHS East Leicestershire and Rutland CCG',
             '2' : 'NHS West Leicestershire CCG',
             '3' : 'Corby',
             '4' : 'Nene',
-        }[self.ccg]
+        }
+        
+        return ccgs.get(self.ccg, '')
 
     @property
     def full_address(self):
