@@ -124,7 +124,7 @@ def submissions_csv(invoice_year, invoice_quarter):
 
     participants = q.order_by(
             Practice.code,
-            Recruit.recruited_recruited.asc()
+            Recruit.recruited_date.asc()
         ).all()
 
     for p in participants:
