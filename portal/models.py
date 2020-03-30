@@ -243,17 +243,13 @@ class Practice(db.Model):
 
     @property
     def ccg_name(self):
-        if self.project_id == 29:
-            return {
-                3 : 'Corby',
-                4 : 'Nene',
-            }[self.ccg]
-        elif self.project_id == 53:
-            return {
-                0 : 'NHS Leicester City CCG',
-                1 : 'NHS East Leicestershire and Rutland CCG',
-                2 : 'NHS West Leicestershire CCG',
-            }[self.ccg]
+        return {
+            0 : 'NHS Leicester City CCG',
+            1 : 'NHS East Leicestershire and Rutland CCG',
+            2 : 'NHS West Leicestershire CCG',
+            3 : 'Corby',
+            4 : 'Nene',
+        }[self.ccg]
 
     @property
     def full_address(self):
