@@ -61,9 +61,12 @@ def submissions_participants(invoice_year, invoice_quarter, page=1):
         Recruit.invoice_year == invoice_year
     ).filter(
         Recruit.invoice_quarter == invoice_quarter
-    ).filter(
-        Recruit.practice_code.in_(p.code for p in current_user.all_practices)
     )
+
+    if not current_user.is_admin:
+        q = q.filter(
+            Recruit.practice_code.in_(p.code for p in current_user.all_practices)
+        )
 
     participants = (
         q.order_by(
@@ -118,9 +121,12 @@ def submissions_csv(invoice_year, invoice_quarter):
         Recruit.invoice_quarter == invoice_quarter
     ).filter(
         Recruit.status != 'Excluded'
-    ).filter(
-        Recruit.practice_code.in_(p.code for p in current_user.all_practices)
     )
+    
+    if not current_user.is_admin:
+        q = q.filter(
+            Recruit.practice_code.in_(p.code for p in current_user.all_practices)
+        )
 
     participants = q.order_by(
             Practice.code,
