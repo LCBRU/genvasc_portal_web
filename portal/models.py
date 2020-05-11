@@ -214,7 +214,7 @@ class Practice(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.value), nullable=True)
     status = db.relationship(PracticeStatus)
     recruits = db.relationship(Recruit, backref='practice', lazy=True)
-    recruit_summary = db.relationship("RecruitSummary", uselist=False, back_populates="practice", lazy='joined')
+    recruit_summary = db.relationship("RecruitSummary", uselist=False, back_populates="practice")
 
     @property
     def collab_ag_signed_date(self):

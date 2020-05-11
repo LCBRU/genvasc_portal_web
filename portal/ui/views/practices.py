@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for
 from flask_security import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from sqlalchemy import or_, func, and_, not_
+from sqlalchemy.orm import joinedload
 from portal.database import db
 from portal.models import (
     Delegate,
@@ -71,25 +72,27 @@ def practices_index():
                 Practice.partners.like("%{}%".format(search_form.search.data)),
                 Practice.code == search_form.search.data),
             )
+    
+    q = q.options(joinedload('recruit_summary'), joinedload('status')).join(RecruitSummary)
 
     if search_form.sort_by.data == 'code':
         q = q.order_by(Practice.code.asc())
     elif search_form.sort_by.data == 'recruits_desc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.recruited.desc())
+        q = q.order_by(RecruitSummary.recruited.desc())
     elif search_form.sort_by.data == 'recruits_asc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.recruited.asc())
+        q = q.order_by(RecruitSummary.recruited.asc())
     elif search_form.sort_by.data == 'excluded_desc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.excluded_percentage.desc())
+        q = q.order_by(RecruitSummary.excluded_percentage.desc())
     elif search_form.sort_by.data == 'excluded_asc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.excluded_percentage.asc())
+        q = q.order_by(RecruitSummary.excluded_percentage.asc())
     elif search_form.sort_by.data == 'withdrawn_desc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.withdrawn_percentage.desc())
+        q = q.order_by(RecruitSummary.withdrawn_percentage.desc())
     elif search_form.sort_by.data == 'withdrawn_asc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.withdrawn_percentage.asc())
+        q = q.order_by(RecruitSummary.withdrawn_percentage.asc())
     elif search_form.sort_by.data == 'last_recruited_desc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.last_recruited_date.desc())
+        q = q.order_by(RecruitSummary.last_recruited_date.desc())
     elif search_form.sort_by.data == 'last_recruited_asc':
-        q = q.join(RecruitSummary).order_by(RecruitSummary.last_recruited_date.asc())
+        q = q.order_by(RecruitSummary.last_recruited_date.asc())
     else:
         q = q.order_by(Practice.name.asc())
 

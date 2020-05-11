@@ -2,6 +2,7 @@ import string
 from flask import g, current_app
 from flask_login import LoginManager, current_user
 from flask_security import Security, SQLAlchemyUserDatastore
+from sqlalchemy.orm import joinedload
 from wtforms import PasswordField, SubmitField
 from flask_security.forms import (
     EqualTo,
@@ -83,7 +84,7 @@ class ChangePasswordForm(Form, PasswordFormMixin):
 
 
 def load_user(email):
-    return User.query.filter_by(email=email).one_or_none()
+    return User.query.options(joinedload('roles')).filter_by(email=email).one_or_none()
 
 def init_security(app):
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
