@@ -212,7 +212,7 @@ class Practice(db.Model):
     agree_66_end_date_2_str = db.Column(db.String, nullable=True)
     genvasc_initiated = db.Column(db.Boolean, nullable=True)
     status_id = db.Column(db.Integer, db.ForeignKey(PracticeStatus.value), nullable=True)
-    status = db.relationship(PracticeStatus)
+    status = db.relationship(PracticeStatus, lazy="joined")
     recruits = db.relationship(Recruit, backref='practice', lazy=True)
     recruit_summary = db.relationship("RecruitSummary", uselist=False, back_populates="practice")
 

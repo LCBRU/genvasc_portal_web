@@ -73,7 +73,7 @@ def practices_index():
                 Practice.code == search_form.search.data),
             )
     
-    q = q.options(joinedload('recruit_summary'), joinedload('status')).join(RecruitSummary)
+    q = q.options(joinedload('recruit_summary')).join(RecruitSummary)
 
     if search_form.sort_by.data == 'code':
         q = q.order_by(Practice.code.asc())
@@ -300,7 +300,7 @@ def delegates_pdf(code):
 
 
 def delegate_search_query(search_form, code):
-    q = Delegate.query.filter(Delegate.practice_code == code).outerjoin(User)
+    q = Delegate.query.options(joinedload('user')).filter(Delegate.practice_code == code)
 
     if search_form.search.data:
         q = q.filter(Delegate.name.like("%{}%".format(search_form.search.data)))
