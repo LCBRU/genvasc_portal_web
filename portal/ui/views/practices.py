@@ -127,9 +127,9 @@ def recruits_index(code):
     q = Recruit.query.filter(Recruit.practice_code == code)
     q = filter_equals_by_truefalsenone(q, search_form.excluded, Recruit.status, 'Excluded')
 
-    if search_form.recruited_or_available.data.casefold() == 'true':
+    if (search_form.recruited_or_available.data or '').casefold() == 'true':
         q = q.filter(or_(Recruit.status == 'Recruited', Recruit.status == 'Available for cohort'))
-    elif search_form.recruited_or_available.data.casefold() == 'false':
+    elif (search_form.recruited_or_available.data or '').casefold() == 'false':
         q = q.filter(Recruit.status != 'Recruited')
         q = q.filter(Recruit.status != 'Available for cohort')
 
