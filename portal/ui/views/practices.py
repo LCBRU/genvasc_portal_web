@@ -32,14 +32,14 @@ def practices_index():
     q = filter_boolean_by_truefalsenone(q, search_form.collabortaion_signed, Practice.collab_ag_comp_yn)
     q = filter_boolean_by_truefalsenone(q, search_form.genvasc_initiated, Practice.genvasc_initiated)
 
-    if search_form.has_current_isa.data.casefold() == 'true':
+    if (search_form.has_current_isa.data or '').casefold() == 'true':
         q = q.filter(or_(
             and_(Practice.isa_comp_yn == True, Practice.isa_1_caldicott_guard_end_str == None).self_group(),
             and_(Practice.isa_comp_yn == True, Practice.isa_1_caldicott_guard_end_str >= datetime.datetime.utcnow().strftime('%Y-%m-%d')).self_group(),
             and_(Practice.agree_66_comp_yn == True, Practice.agree_66_end_date_2_str == None).self_group(),
             and_(Practice.agree_66_comp_yn == True, Practice.agree_66_end_date_2_str >= datetime.datetime.utcnow().strftime('%Y-%m-%d')).self_group(),
         ))
-    elif search_form.has_current_isa.data.casefold() == 'false':
+    elif (search_form.has_current_isa.data or '').casefold() == 'false':
         q = q.filter(and_(
             or_(
                 Practice.isa_comp_yn == None,
