@@ -20,3 +20,4 @@ celery
 urllib3
 python-dateutil
 Flask-Admin
+wtforms[email]
