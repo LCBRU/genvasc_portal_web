@@ -53,7 +53,7 @@ def practices_index():
             ).self_group(),
         ))
 
-    if search_form.status.data.isdigit():
+    if (search_form.status.data or '').isdigit():
         q = q.join(
             PracticeStatus
         ).filter(
