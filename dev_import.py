@@ -13,6 +13,7 @@ from portal.etl.database import (
     practice_group_table,
     practice_groups_practices_table,
     practice_status_table,
+    exclusion_reason_table,
 )
 from portal.models import (
     Recruit,
@@ -21,6 +22,7 @@ from portal.models import (
     Practice,
     PracticeGroup,
     PracticeStatus,
+    ExclusionReason,
 )
 from portal import create_app
 
@@ -67,8 +69,7 @@ def import_recruits():
             recruited_date DATE,
             invoice_year VARCHAR(255),
             invoice_quarter VARCHAR(255),
-            reimbursed_status VARCHAR(255),
-            exclusion_reason VARCHAR(500)
+            reimbursed_status VARCHAR(255)
         );
         """)
 
@@ -98,7 +99,6 @@ def import_recruits():
                 invoice_year=r['invoice_year'],
                 invoice_quarter=r['invoice_quarter'],
                 reimbursed_status=r['reimbursed_status'],
-                exclusion_reason=r['exclusion_reason'],
             ))
 
     db.session.add_all(imports)
@@ -328,6 +328,29 @@ def import_practice_groups_practices():
     db.session.commit()
 
 
+def import_exclusion_reasons():
+    db.engine.execute("""
+        CREATE TABLE IF NOT EXISTS etl_exclusion_reason (
+            civicrm_case_id INT PRIMARY KEY,
+            details VARCHAR(500)
+        );
+        """)
+
+    imports = []
+
+    with etl_import_database() as r_db:
+        for r in r_db.execute(exclusion_reason_table.select()):
+            imports.append(ExclusionReason(
+                civicrm_case_id=r['civicrm_case_id'],
+                details=r['details'],
+            ))
+
+    db.session.add_all(imports)
+    db.session.flush()
+
+    db.session.commit()
+
+
 # Load environment variables from '.env' file.
 load_dotenv()
 
@@ -342,5 +365,6 @@ import_recruits()
 import_recruit_summary()
 import_delegates()
 import_practice_groups_practices()
+import_exclusion_reasons()
 
 context.pop()

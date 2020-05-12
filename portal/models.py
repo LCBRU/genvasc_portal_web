@@ -159,14 +159,18 @@ class Recruit(db.Model):
     invoice_year = db.Column(db.Integer)
     invoice_quarter = db.Column(db.String(50))
     reimbursed_status = db.Column(db.String(50))
-    exclusion_reason = db.Column(db.String(500))
+    exclusion_reason = db.relationship("ExclusionReason", uselist=False, back_populates="recruit")
 
     @property
     def exclusion_reason_stripped(self):
         re_tag = re.compile(r'(<!--.*?-->|<[^>]*>)')
         re_nbsp = re.compile(r'(&nbsp;)')
         re_amp = re.compile(r'(&amp;)')
-        return re_amp.sub('&', re_nbsp.sub('', re_tag.sub('', self.exclusion_reason or ''))).strip()
+
+        if self.exclusion_reason:
+            return re_amp.sub('&', re_nbsp.sub('', re_tag.sub('', self.exclusion_reason.details or ''))).strip()
+        else:
+            return ''
 
     @property
     def exclusion_text(self):
@@ -185,6 +189,14 @@ class Recruit(db.Model):
             self.invoice_year or '',
             self.invoice_quarter or '',
         ).strip()
+
+
+class ExclusionReason(db.Model):
+    __tablename__ = 'etl_exclusion_reason'
+
+    civicrm_case_id = db.Column(db.Integer, db.ForeignKey(Recruit.civicrm_case_id), primary_key=True, nullable=False)
+    recruit = db.relationship("Recruit", uselist=False, back_populates="exclusion_reason")
+    details = db.Column(db.String(50))
 
 
 class Practice(db.Model):

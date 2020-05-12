@@ -12,25 +12,11 @@ select
     cas.start_date AS recruited_date,
     inv.invoice_year_107 AS invoice_year,
     inv.invoice_quarter_108 AS invoice_quarter,
-    inv.reimbursed_status_114 AS reimbursed_status,
-    exclusion_reason.details AS exclusion_reason
+    inv.reimbursed_status_114 AS reimbursed_status
 from civicrmlive_docker4716.civicrm_case cas
 left join civicrmlive_docker4716.civicrm_option_value cs
 	on cs.value = cas.status_id
 	and cs.option_group_id = 27
-LEFT JOIN (
-	SELECT
-		casa.case_id,
-		GROUP_CONCAT(COALESCE(a.details, '')) details
-	FROM civicrmlive_docker4716.civicrm_case_activity casa
-	join civicrmlive_docker4716.civicrm_activity a
-		on a.id = casa.activity_id 
-		and a.activity_type_id = 16
-		AND a.details IS NOT NULL
-		AND a.is_deleted = 0
-		AND a.subject LIKE '%to Excluded'
-	GROUP BY casa.case_id
-) exclusion_reason ON exclusion_reason.case_id = cas.id
 join civicrmlive_docker4716.civicrm_case_contact cc
 	on cc.case_id = cas.id
 join civicrmlive_docker4716.civicrm_contact con
