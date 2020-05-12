@@ -316,7 +316,9 @@ def delegate_search_query(search_form, code):
 
 
 def filter_equals_by_truefalsenone(query, form_field, model_field, value):
-    if form_field.data.casefold() == 'true':
+    if form_field.data is None:
+        return query
+    elif form_field.data.casefold() == 'true':
         return query.filter(model_field == value)
     elif form_field.data.casefold() == 'false':
         return query.filter(model_field != value)
@@ -325,7 +327,9 @@ def filter_equals_by_truefalsenone(query, form_field, model_field, value):
 
 
 def filter_isNone_by_truefalsenone(query, form_field, model_field):
-    if form_field.data.casefold() == 'true':
+    if form_field.data is None:
+        return query
+    elif form_field.data.casefold() == 'true':
         return query.filter(model_field != None)
     elif form_field.data.casefold() == 'false':
         return query.filter(model_field == None)
@@ -334,7 +338,9 @@ def filter_isNone_by_truefalsenone(query, form_field, model_field):
 
 
 def filter_boolean_by_truefalsenone(query, form_field, model_field):
-    if form_field.data.casefold() == 'true':
+    if form_field.data is None:
+        return query
+    elif form_field.data.casefold() == 'true':
         return query.filter(model_field == True)
     elif form_field.data.casefold() == 'false':
         return query.filter(or_(model_field == False, model_field == None).self_group())
