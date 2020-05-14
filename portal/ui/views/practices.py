@@ -73,7 +73,7 @@ def practices_index():
                 Practice.code == search_form.search.data),
             )
     
-    q = q.options(joinedload('recruit_summary')).join(RecruitSummary)
+    q = q.options(joinedload('recruit_summary'))
 
     if search_form.sort_by.data == 'code':
         q = q.order_by(Practice.code.asc())
