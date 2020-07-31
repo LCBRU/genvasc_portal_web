@@ -76,8 +76,9 @@ def import_user():
 
     db.session.add_all(users)
     db.session.flush()
-    
-    User.query.filter(User.id.notin_([u.id for u in users]), User.is_imported.is_(True)).delete(synchronize_session='fetch')
+
+    for u in User.query.filter(User.id.notin_([u.id for u in users]), User.is_imported.is_(True)).all():
+        db.session.delete(u)
 
     db.session.commit()
 
