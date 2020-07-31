@@ -55,7 +55,7 @@ def import_user():
 
     with etl_practice_database() as p_db:
         for email, details in groupby(p_db.execute(user_table.select().order_by(user_table.c.email)), key=lambda x: x['email'].lower()):
-            user = existing_users[email]
+            user = existing_users.get(email, None)
 
             if user is None:
                 user = User(email=email)
