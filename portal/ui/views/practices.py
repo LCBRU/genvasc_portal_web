@@ -400,7 +400,7 @@ def recruits_csv(code):
     })
 
     resp = make_response(si.getvalue())
-    resp.headers["Content-Disposition"] = "attachment; filename=Genvasc_Participant_{}csv".format(code)
+    resp.headers["Content-Disposition"] = "attachment; filename=Genvasc_Participant_{}.csv".format(code)
     resp.headers["Content-type"] = "text/csv"
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     resp.headers["Pragma"] = "no-cache"
