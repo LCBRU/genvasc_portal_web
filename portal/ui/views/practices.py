@@ -1,5 +1,7 @@
+import csv
+import io
 import datetime
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, make_response
 from flask_security import login_required, current_user
 from flask_weasyprint import HTML, render_pdf
 from sqlalchemy import or_, func, and_, not_
@@ -346,3 +348,61 @@ def filter_boolean_by_truefalsenone(query, form_field, model_field):
         return query.filter(or_(model_field == False, model_field == None).self_group())
     else:
         return query
+
+
+@blueprint.route('/practices/<string:code>/recruits/pdf')
+@assert_practice_user()
+@login_required
+def recruits_csv(code):
+
+    COL_NHS_NUMBER = 'NHS Number'
+    COL_STUDY_PARTICIPANT_ID = 'Study Participant ID'
+    COL_FIRST_NAME = 'First Name'
+    COL_LAST_NAME = 'Last Name'
+    COL_DOB = 'Date of Birth'
+    COL_RECRUITED_DATE = 'Recruited Date'
+  
+    fieldnames = [
+        COL_NHS_NUMBER,
+        COL_STUDY_PARTICIPANT_ID,
+        COL_FIRST_NAME,
+        COL_LAST_NAME,
+        COL_DOB,
+        COL_RECRUITED_DATE,
+    ]
+
+    si = io.StringIO()
+
+    output = csv.DictWriter(
+        si,
+        fieldnames=fieldnames,
+        quoting=csv.QUOTE_NONNUMERIC
+    )
+
+    output.writeheader()
+    
+    q = Recruit.query.filter(
+        Recruit.practice_code == code
+    )
+    
+    participants = q.order_by(
+            Recruit.recruited_date.asc()
+        ).all()
+
+    for p in participants:
+        output.writerow({
+            COL_RECRUITED_DATE: p.recruited_date,
+            COL_STUDY_PARTICIPANT_ID: p.study_id,
+            COL_NHS_NUMBER: p.nhs_number,
+            COL_FIRST_NAME: p.first_name,
+            COL_LAST_NAME: p.last_name,
+            COL_DOB: p.date_of_birth,
+    })
+
+    resp = make_response(si.getvalue())
+    resp.headers["Content-Disposition"] = "attachment; filename=Genvasc_Participant_{}csv".format(code)
+    resp.headers["Content-type"] = "text/csv"
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = 0
+    return resp

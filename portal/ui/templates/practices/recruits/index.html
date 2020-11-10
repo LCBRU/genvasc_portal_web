@@ -5,7 +5,7 @@
 {% block practice_content %}
 
 <div class="page-header">
-  {{ formhelper.render_search(searchForm, 'ui.recruits_index', code=practice.code) }}
+  {{ formhelper.render_search(searchForm, 'ui.recruits_index', buttons={'PDF': 'ui.recruits_csv'} , code=practice.code) }}
 </div>
 
 <ul class="list-group">
