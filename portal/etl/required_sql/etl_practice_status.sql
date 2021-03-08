@@ -1,7 +1,16 @@
-ALTER VIEW etl_practice_status AS
+CREATE OR REPLACE
+ALGORITHM = UNDEFINED VIEW `etl_practice_status` AS
 SELECT
-	value AS id,
-	name
-FROM redcap6170_briccsext.LCBRU_Enums
-WHERE project_id= 53
-	AND field_name = 'status'
+    `LCBRU_Enums`.`value` AS `id`,
+    `LCBRU_Enums`.`name` AS `name`
+FROM
+    `redcap_genvasc`.`LCBRU_Enums`
+WHERE
+    (
+        (
+            `LCBRU_Enums`.`project_id` = 15
+        )
+        AND (
+            `LCBRU_Enums`.`field_name` = 'status'
+        )
+    )
