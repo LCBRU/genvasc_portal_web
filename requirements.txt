@@ -16,7 +16,7 @@ Flask-WeasyPrint
 flask_mail
 python-dotenv
 sqlalchemy-migrate
-celery==4.4.2
+celery==5.2.2
 urllib3
 python-dateutil
 Flask-Admin
