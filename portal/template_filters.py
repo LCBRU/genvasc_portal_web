@@ -57,7 +57,7 @@ def init_template_filters(app):
 
     @app.template_filter("title_case")
     def currency(value):
-        return value.title()
+        return str(value).title()
 
     @app.context_processor
     def inject_now():
