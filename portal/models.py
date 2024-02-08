@@ -8,6 +8,7 @@ from flask_security import UserMixin, RoleMixin
 from sqlalchemy import ForeignKeyConstraint, select, func
 from sqlalchemy.orm import column_property
 from portal.utils import parse_date
+import uuid
 
 
 roles_users = db.Table(
@@ -307,6 +308,10 @@ class Role(db.Model, RoleMixin):
         return self.name
 
 
+def random_fs_uniquifier():
+    return uuid.uuid4().hex
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, index=True)
@@ -324,6 +329,7 @@ class User(db.Model, UserMixin):
     current_login_ip = db.Column(db.String(50))
     login_count = db.Column(db.Integer())
     is_imported = db.Column(db.Boolean(), default=False)
+    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False, default=random_fs_uniquifier)
     roles = db.relationship(
         'Role',
         secondary=roles_users,
