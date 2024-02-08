@@ -91,5 +91,6 @@ ENV/
 # Environment
 screenshot.png
 .vscode
+.venv
 database.sqlite3
 celerybeat.pid

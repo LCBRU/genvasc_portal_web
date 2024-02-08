@@ -7,7 +7,7 @@ SQLAlchemy
 Werkzeug
 gunicorn
 itsdangerous
-mysqlclient
+pymysql
 Flask-WTF
 WTForms-Components
 flask-security-too[fsqla,common]
