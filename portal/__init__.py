@@ -31,8 +31,4 @@ def create_app(config=BaseConfig):
 
     app.register_blueprint(ui_blueprint)
 
-    @app.before_first_request
-    def init_data():
-        init_users()
-
     return app
