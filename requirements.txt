@@ -1,5 +1,6 @@
 Flask
 Flask-SQLAlchemy
+sqlalchemy<2.00
 Jinja2
 MarkupSafe
 SQLAlchemy
@@ -9,7 +10,7 @@ itsdangerous
 mysqlclient
 Flask-WTF
 WTForms-Components
-flask-security
+flask-security-too[fsqla,common]
 pyyaml
 weasyprint
 Flask-WeasyPrint
