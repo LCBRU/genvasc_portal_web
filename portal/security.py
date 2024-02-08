@@ -38,7 +38,7 @@ class PasswordPolicy(ValidatorMixin):
 class NewPasswordFormMixin():
     password = PasswordField(
         get_form_field_label('password'),
-        validators=[password_required, password_length, PasswordPolicy()])
+        validators=[password_required, PasswordPolicy()])
 
 
 class PasswordConfirmFormMixin():
